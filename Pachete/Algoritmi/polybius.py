@@ -1,5 +1,10 @@
+import numpy as np
+
 def polybius(msg, alfabet, latura):
-    ...
+
+    if len(alfabet) == 25:
+
+
 
 def ADFGX(msg, alfabet, cheie):
     ...
