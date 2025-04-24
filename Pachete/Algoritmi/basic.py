@@ -3,7 +3,6 @@ import numpy as np
 litere_mici = np.array((chr(litera) for litera in range(97, 123)))
 litere_mari = np.array((chr(litera) for litera in range(65, 91)))
 
-# functie de criptare ce foloseste cifrul lui Caesar
 # primeste mesajul (string), numărul de poziții (după care sunt schimbate literele) și acțiunea (criptare sau decriptare)
 def cezar(mesaj, nr_pozitii, actiune):
 
@@ -36,6 +35,9 @@ def cezar(mesaj, nr_pozitii, actiune):
 
         return ''.join(mesaj_decriptat)
 
+# primeste mesajul (string), numărul de poziții (după care sunt schimbate literele) și acțiunea (criptare sau decriptare)
+def vignere(mesaj, cheie, actiune):
+    ...
 
 def main():
     print(cezar('abcd', 29, 'decriptare'))
