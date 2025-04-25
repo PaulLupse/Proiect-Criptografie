@@ -123,4 +123,4 @@ def main():
         print(str(index + 1) + '. ' + candidat)
 
 if __name__ == '__main__':
-    main()
+    from ..Utilități import ceva

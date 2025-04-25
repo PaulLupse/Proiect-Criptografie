@@ -1,7 +1,14 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as msgbox
-import CustomWidgets as Cw
+try:
+    import CustomWidgets as Cw
+except:
+    from . import CustomWidgets as Cw
+try:
+    from ..Algoritmi import basic
+except:
+    print("IMPORTURILE RELATIVE FUNCTIONEAZA NUMA CAND RULEZI CODUL DIN main.py")
 
 def update_settings(combobox, settings_frame, entry_vals):
 
@@ -55,9 +62,9 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         if not verify_entry_caesar(shift_value):
             msgbox.showerror("Eroare","Cheia trebuie să fie cuprinsă între -100 și 100!")
             return
-        output_text = "Test1"                # aici o sa fie egal cu stringul returnat de functie
+
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", output_text) #in loc de input text trebuie rezultatul functiei
+        textbox2.insert("end-1c", basic.cezar(input_text, shift_value, 'criptare')) #in loc de input text trebuie rezultatul functiei
 
 def decrypt(textbox1, textbox2, combobox, entry_vals):
 
@@ -81,7 +88,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
             return
         output_text = "Test2"              #aici output_text o sa fie stringul returnat de functie
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", output_text)
+        textbox2.insert("end-1c", basic.cezar(input_text, shift_value, 'decriptare'))
 
 def brute_force_caesar(textbox1, textbox2):
 
@@ -90,7 +97,7 @@ def brute_force_caesar(textbox1, textbox2):
     if not verify_text_caesar(input_text):
         msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
         return
-    string_list = ["Test1", "Test2", "Test3"]    #aici string_list o sa fie egal cu lista de stringuri ce o returneaza functia
+    string_list = basic.cezar(input_text, None, 'spargere')    #aici string_list o sa fie egal cu lista de stringuri ce o returneaza functia
     textbox2.delete("1.0", "end-1c")
     for i, string in enumerate(string_list, start=1):
         textbox2.insert("end", f"{i}. {string}\n")
@@ -101,9 +108,11 @@ def main():
     root = tk.Tk()
     root.resizable(False,False)
     root.title("Algoritmi de Criptare")
-    root.iconbitmap("imagine-lacat.ico")
+    try:
+        root.iconbitmap("imagine-lacat.ico")
+    except:
+        print("Nush")
     entry_vals = {}
-
     textbox1 = Cw.LabeledTextbox(root, "Text:", "n", 10, 20,0,0,20,1)
     entry_vals["textbox1"] = textbox1
     textbox2 = Cw.LabeledTextbox(root, "Text criptat/decriptat:", "n", 10, 20,0,2,20,1)
