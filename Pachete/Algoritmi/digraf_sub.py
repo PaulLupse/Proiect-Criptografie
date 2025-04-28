@@ -119,11 +119,49 @@ def playfair(mesaj, cheie, operatie):
 
         return mesaj_decriptat
 
+def hill(mesaj, cheie, operatie):
+
+    mesaj = __sterge_spatii(mesaj.lower())
+    lung_mesaj = len(mesaj)
+
+    cheie = cheie.lower()
+    sqrt_lung_cheie = int(len(cheie) ** (1/2))
+
+    while len(mesaj) % sqrt_lung_cheie != 0:
+        mesaj += 'z'
+
+    matrice_cheie = np.zeros((sqrt_lung_cheie, sqrt_lung_cheie), dtype = int)
+    index_cheie = 0
+    for i in range(0, sqrt_lung_cheie):
+        for j in range(0, sqrt_lung_cheie):
+            matrice_cheie[i][j] = ord(cheie[index_cheie]) - 97
+            index_cheie += 1
 
 
-def hill():
-    ...
+    if operatie == 'criptare':
+        mesaj_criptat = ''
+        index_mesaj = 0
+        while index_mesaj < lung_mesaj:
+
+            secv = mesaj[index_mesaj:index_mesaj + sqrt_lung_cheie:]
+            secv_vectorial = np.zeros((sqrt_lung_cheie,), dtype = int)
+            for index, litera in enumerate(secv):
+                secv_vectorial[index] = ord(litera) - 97
+
+            rezultat = np.matmul(matrice_cheie, secv_vectorial)
+
+            mesaj_criptat += ''.join([chr(nr % 26 + 97) for nr in rezultat])
+            mesaj_criptat += ' '
+
+            index_mesaj += sqrt_lung_cheie
+
+        return mesaj_criptat
+
+    else:
+        ...
+
+
 
 if __name__ == '__main__':
-    a = playfair('smparmkmnrsrliormktllumxacmrmworebrmmgmbmktlgl', 'monarchy', 'decriptare')
+    a = hill('mama', 'ADFGVWXYZ', 'a')
     print(a)

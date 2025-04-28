@@ -135,6 +135,12 @@ def bifid(mesaj, alfabet, operatie):
 
         return mesaj_decriptat
 
+
+# bifid in 3D
+def trifid(mesaj, strat1, strat2, strat3, operatie):
+    ...
+
+
 def __compara_coloane(col1, col2): # compara doua coloane, vectori de caractere din numpy
     ord1 = col1[-1]
     ord2 = col2[-1]
