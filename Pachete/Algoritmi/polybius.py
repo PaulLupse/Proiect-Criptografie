@@ -18,9 +18,7 @@ def polybius(mesaj, alfabet, operatie):
     mesaj = mesaj.lower()
     # in cazul in care 'j' nu este inclus in alfabet, acesta va fii considerat egal cu 'i'
     if 'j' not in alfabet and 'i' in alfabet:
-        for i in range(0, len(mesaj)):
-            if mesaj[i] == 'j':
-                mesaj = mesaj[0:i:] + 'i' + mesaj[i + 1::]
+        mesaj.translate({106 : 105})
 
     lung_alfa = len(alfabet)
     sqrt_lung_alfa = int(lung_alfa**(1/2))
@@ -65,9 +63,7 @@ def bifid(mesaj, alfabet, operatie):
 
     # in cazul in care 'j' nu este inclus in alfabet, acesta va fii considerat egal cu 'i'
     if 'j' not in alfabet and 'i' in alfabet:
-        for i in range(0, len(mesaj)):
-            if mesaj[i] == 'j':
-                mesaj = mesaj[0:i:] + 'i' + mesaj[i + 1::]
+        mesaj.translate({106 : 105})
 
 
     lung_alfa = len(alfabet)
@@ -140,7 +136,6 @@ def bifid(mesaj, alfabet, operatie):
 def trifid(mesaj, strat1, strat2, strat3, operatie):
     ...
 
-
 def __compara_coloane(col1, col2): # compara doua coloane, vectori de caractere din numpy
     ord1 = col1[-1]
     ord2 = col2[-1]
@@ -183,27 +178,13 @@ def adfgvx(mesaj, alfabet, cheie, operatie):
 
     # in cazul in care 'j' nu este inclus in alfabet, acesta va fii considerat egal cu 'i'
     if 'j' not in alfabet and 'i' in alfabet:
-        for i in range(0, lung_mesaj):
-            if mesaj[i] == 'j':
-                mesaj = mesaj[0:i:] + 'i' + mesaj[i + 1::]
+        mesaj.translate({106 : 105})
 
     lung_alfa = len(alfabet)
     sqrt_lung_alfa = int(lung_alfa ** (1 / 2))
 
-    if lung_alfa == 25: # pentru ADFGX
-        cod = ('a', 'd', 'f', 'g', 'x')
-        cod_index = {'a': 0, 'd': 1, 'f': 2, 'g': 3, 'x': 4}
-
-    # / A D F G X
-    # A . . . . .
-    # D . . . . .
-    # F . . . . .
-    # G . . . . .
-    # X . . . . .
-
-    else: # pentru ADFGVXZ
-        cod = ('a', 'd', 'f', 'g', 'v', 'x', 'z')
-        cod_index = {'a': 0, 'd': 1, 'f': 2, 'g': 3, 'v' : 4, 'x': 5, 'z': 6}
+    cod = ('a', 'd', 'f', 'g', 'v', 'x', 'z')
+    cod_index = {'a': 0, 'd': 1, 'f': 2, 'g': 3, 'v' : 4, 'x': 5, 'z': 6}
 
     # / A D F G V X Z
     # A . . . . . . .

@@ -1,4 +1,5 @@
 import numpy as np
+import sympy as sp
 
 def __sterge_spatii(mesaj):
     i = 0
@@ -158,10 +159,27 @@ def hill(mesaj, cheie, operatie):
         return mesaj_criptat
 
     else:
-        ...
+
+        inversa_matrice_cheie = np.array(sp.Matrix(matrice_cheie).inv_mod(26))
 
 
+        mesaj_decriptat = ''
+        index_mesaj = 0
+        while index_mesaj < lung_mesaj:
+
+            secv = mesaj[index_mesaj:index_mesaj + sqrt_lung_cheie:]
+            secv_vectorial = np.zeros((sqrt_lung_cheie,), dtype=int)
+            for index, litera in enumerate(secv):
+                secv_vectorial[index] = ord(litera) - 97
+
+            rezultat = np.matmul(inversa_matrice_cheie, secv_vectorial)
+
+            mesaj_decriptat += ''.join([chr(nr % 26 + 97) for nr in rezultat])
+
+            index_mesaj += sqrt_lung_cheie
+
+        return mesaj_decriptat
 
 if __name__ == '__main__':
-    a = hill('mama', 'ADFGVWXYZ', 'a')
+    a = hill('glw xop ewh osl ick wal wgp ifa jes usb ccw doj szq iaz wgp', 'GYBNQKURP', 'decriptare')
     print(a)
