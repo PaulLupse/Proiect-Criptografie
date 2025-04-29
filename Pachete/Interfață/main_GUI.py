@@ -2,7 +2,6 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as msgbox
 from tkinter.constants import DISABLED, NORMAL
-
 try:
     import CustomWidgets as Cw
 except:
@@ -11,6 +10,27 @@ try:
     from ..Algoritmi import basic
 except:
     print("IMPORTURILE RELATIVE FUNCTIONEAZA NUMA CAND RULEZI CODUL DIN main.py")
+
+def right_click_menu(widget):
+    menu = tk.Menu(widget, tearoff = 0)
+    menu.add_command(label = "Copy", command = lambda: widget.event_generate("<<Copy>>"))
+    menu.add_command(label = "Paste", command = lambda: widget.event_generate("<<Paste>>"))
+
+    def show_menu(event):
+        menu.tk_popup(event.x_root, event.y_root)
+
+    widget.bind("<Button-3>", show_menu)
+
+def limit_one_char(event):
+    widget = event.widget
+    val = widget.get()
+    if len(val) > 1:
+        widget.delete(1, tk.END)
+
+def reset_polybius_entry(entry_vals):
+
+    for entry in entry_vals["polybius_entry"]:
+        entry.delete(0, tk.END)
 
 def update_settings(combobox, settings_frame, entry_vals):
 
@@ -34,6 +54,37 @@ def update_settings(combobox, settings_frame, entry_vals):
         vigenere_textbox = Cw.LabeledTextbox(settings_frame, "Cheie de criptare:", "n",3,15,0,0,1,1)
         entry_vals["vigenere_textbox"] = vigenere_textbox
 
+    elif selected_algorithm == "Polybius":
+        size = 5
+
+        reset_button = ttk.Button(settings_frame, text = "Resetare alfabet", command=lambda: reset_polybius_entry(entry_vals))
+        reset_button.grid(row = 0, column = 0, columnspan = 10)
+
+        for row in range(size):
+            if row == size-1:
+                padding_value = (0,20)
+            else:
+                padding_value = 0
+            row_labels = tk.Label(settings_frame, text = str(row))
+            row_labels.grid(row = row+2, column = 0, pady = padding_value)
+        for col in range(size):
+            col_labels = tk.Label(settings_frame, text = str(col))
+            col_labels.grid(row = 1, column = col+2, padx = 5)
+
+        polybius_entry = []
+        for row in range(size):
+            if row == size-1:
+                padding_value = (0,20)
+            else:
+                padding_value = 0
+            for col in range(size):
+                entry = tk.Entry(settings_frame, width = 2, justify = "center")
+                entry.grid(row = row+2, column = col+2, pady = padding_value)
+                entry.bind("<KeyRelease>", limit_one_char)
+                entry.bind("<FocusOut>", limit_one_char)
+                polybius_entry.append(entry)
+        entry_vals["polybius_entry"] = polybius_entry
+
 def verify_text(text):
 
     for char in text:
@@ -53,6 +104,36 @@ def verify_textbox_vigenere(text):
         if not char.isalpha():
             return False
     return True
+
+def polybius_alphabet(entry_vals):
+
+    alphabet = ""
+    duplicate_values = set()
+    for entry in entry_vals["polybius_entry"]:
+        value = entry.get()
+        if value == "":
+            alphabet += "  "
+        else:
+            if value in duplicate_values:
+                return
+            duplicate_values.add(value)
+            alphabet += value
+    return alphabet
+
+def verify_polybius(input_text, alphabet):
+
+    undefined_chars = set()
+    special_cases = ["i", "j"]
+    for char_text in input_text:
+        if char_text in special_cases:
+            if "i" not in alphabet and "j" not in alphabet:
+                undefined_chars.add("i/j")
+        elif char_text != " " and char_text not in alphabet:
+            undefined_chars.add(char_text)
+    if undefined_chars:
+        return undefined_chars
+    else:
+        return None
 
 def crypt(textbox1, textbox2, combobox, entry_vals):
 
@@ -92,6 +173,19 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         textbox2.insert("end-1c", basic.vignere(input_text, key_value, 'criptare'))
         textbox2.config(state = DISABLED)
 
+    elif selected_algorithm == "Polybius":
+        alphabet = polybius_alphabet(entry_vals)
+        if alphabet is None:
+            msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
+            return
+        undefined_chars = verify_polybius(input_text, alphabet)
+        if verify_polybius(input_text, alphabet):
+            msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
+            return
+        textbox2.delete("1.0", "end-1c")
+        textbox2.insert("end-1c", "Test") #aici apelezi functia
+        textbox2.config(state = DISABLED)
+
 def decrypt(textbox1, textbox2, combobox, entry_vals):
 
     selected_algorithm = combobox.get()
@@ -129,19 +223,33 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
         textbox2.insert("end-1c", basic.vignere(input_text, key_value, 'decriptare'))
         textbox2.config(state = DISABLED)
 
+    elif selected_algorithm == "Polybius":
+        alphabet = polybius_alphabet(entry_vals)
+        if alphabet is None:
+            msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
+            return
+        undefined_chars = verify_polybius(input_text, alphabet)
+        if verify_polybius(input_text, alphabet):
+            msgbox.showerror("Eroare",
+                             f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
+            return
+        textbox2.delete("1.0", "end-1c")
+        textbox2.insert("end-1c", "Test") #aici apelezi functia
+        textbox2.config(state = DISABLED)
+
 def brute_force_caesar(textbox1, textbox2):
 
     input_text = textbox1.get("1.0", "end-1c")
-    textbox2.config(state=NORMAL)
+    textbox2.config(state = NORMAL)
 
     if not verify_text(input_text):
         msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
         return
-    string_list = basic.cezar(input_text, None, 'spargere')    #aici string_list o sa fie egal cu lista de stringuri ce o returneaza functia
+    string_list = basic.cezar(input_text, None, 'spargere')
     textbox2.delete("1.0", "end-1c")
     for i, string in enumerate(string_list, start=1):
         textbox2.insert("end", f"{i}. {string}\n")
-    textbox2.config(state=DISABLED)
+    textbox2.config(state = DISABLED)
 
 
 def main():
@@ -156,15 +264,17 @@ def main():
     entry_vals = {}
     textbox1 = Cw.LabeledTextbox(root, "Text:", "n", 10, 20,0,0,20,1)
     entry_vals["textbox1"] = textbox1
+    right_click_menu(textbox1)
     textbox2 = Cw.LabeledTextbox(root, "Text criptat/decriptat:", "n", 10, 20,0,2,20,1)
     entry_vals["textbox2"] = textbox2
+    right_click_menu(textbox2)
 
     options_frame = tk.Frame(root)
     options_frame.grid(row = 0, column = 1, padx = 10, pady = 10, sticky = "n")
     settings_frame = tk.Frame(root)
-    settings_frame.grid(row=1, column=1, sticky="n")
+    settings_frame.grid(row = 1, column = 1, sticky = "n")
 
-    combobox = ttk.Combobox(options_frame, values=["Caesar Cipher","Vigenère Cipher"], state="readonly")
+    combobox = ttk.Combobox(options_frame, values = ["Caesar Cipher","Vigenère Cipher", "Polybius"], state = "readonly")
     combobox.set("Alege algoritmul")
     combobox.grid(row = 0, column = 0, columnspan = 2)
     combobox.bind("<<ComboboxSelected>>", lambda event: update_settings(combobox, settings_frame, entry_vals))
