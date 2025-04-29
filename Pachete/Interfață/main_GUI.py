@@ -8,6 +8,7 @@ except:
     from . import CustomWidgets as Cw
 try:
     from ..Algoritmi import basic
+    from ..Algoritmi import polybius
 except:
     print("IMPORTURILE RELATIVE FUNCTIONEAZA NUMA CAND RULEZI CODUL DIN main.py")
 
@@ -183,7 +184,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
             msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", "Test") #aici apelezi functia
+        textbox2.insert("end-1c", polybius.polybius(mesaj = input_text, alfabet = alphabet, operatie = 'criptare')) #aici apelezi functia
         textbox2.config(state = DISABLED)
 
 def decrypt(textbox1, textbox2, combobox, entry_vals):
@@ -234,7 +235,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
                              f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", "Test") #aici apelezi functia
+        textbox2.insert("end-1c", polybius.polybius(mesaj = input_text, alfabet = alphabet, operatie = 'decriptare'))
         textbox2.config(state = DISABLED)
 
 def brute_force_caesar(textbox1, textbox2):
