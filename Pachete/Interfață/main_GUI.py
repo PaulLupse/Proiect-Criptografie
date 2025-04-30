@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as msgbox
 from tkinter.constants import DISABLED, NORMAL
+import string
 try:
     import CustomWidgets as Cw
 except:
@@ -28,10 +29,73 @@ def limit_one_char(event):
     if len(val) > 1:
         widget.delete(1, tk.END)
 
-def reset_polybius_entry(entry_vals):
+def generate_polybius_matrix(settings_frame, size_combobox, entry_vals):
 
-    for entry in entry_vals["polybius_entry"]:
-        entry.delete(0, tk.END)
+    size = 5
+    combobox_value = size_combobox.get()
+    if combobox_value == "5x5":
+        size = 5
+    if combobox_value == "6x6":
+        size = 6
+    if combobox_value == "7x7":
+        size = 7
+
+    for widget in settings_frame.winfo_children():
+        if not isinstance(widget, tk.Frame):
+            widget.destroy()
+
+    for row in range(size):
+        if row == size - 1:
+            padding_value = (0, 20)
+        else:
+            padding_value = 0
+        row_labels = tk.Label(settings_frame, text=str(row))
+        row_labels.grid(row=row + 2, column=0, pady=padding_value)
+    for col in range(size):
+        col_labels = tk.Label(settings_frame, text=str(col))
+        col_labels.grid(row=1, column=col + 2, padx=5)
+
+    polybius_entry = []
+    for row in range(size):
+        if row == size - 1:
+            padding_value = (0, 20)
+        else:
+            padding_value = 0
+        for col in range(size):
+            entry = tk.Entry(settings_frame, width=2, justify="center")
+            entry.grid(row=row + 2, column=col + 2, pady=padding_value)
+            entry.bind("<KeyRelease>", limit_one_char)
+            entry.bind("<FocusOut>", limit_one_char)
+            polybius_entry.append(entry)
+    entry_vals["polybius_entry"] = polybius_entry
+    reset_polybius_entry(entry_vals, size_combobox)
+
+def reset_polybius_entry(entry_vals, size_combobox):
+
+    alphabet = []
+    combobox_value = size_combobox.get()
+    for c in range(ord('a'), ord('z') + 1):
+        if chr(c) != 'j':
+            alphabet.append(chr(c))
+
+    if combobox_value == "5x5":
+        for i, entry in enumerate(entry_vals["polybius_entry"]):
+            entry.delete(0, tk.END)
+            if i < len(alphabet):
+                entry.insert(0, alphabet[i])
+
+    alphabet = alphabet + [char for char in string.digits] + [char for char in string.punctuation]
+    if combobox_value == "6x6":
+        for i, entry in enumerate(entry_vals["polybius_entry"]):
+            entry.delete(0, tk.END)
+            if i < len(alphabet):
+                entry.insert(0, alphabet[i])
+
+    if combobox_value == "7x7":
+        for i, entry in enumerate(entry_vals["polybius_entry"]):
+            entry.delete(0, tk.END)
+            if i < len(alphabet):
+                entry.insert(0, alphabet[i])
 
 def update_settings(combobox, settings_frame, entry_vals):
 
@@ -56,35 +120,17 @@ def update_settings(combobox, settings_frame, entry_vals):
         entry_vals["vigenere_textbox"] = vigenere_textbox
 
     elif selected_algorithm == "Polybius":
-        size = 5
 
-        reset_button = ttk.Button(settings_frame, text = "Resetare alfabet", command=lambda: reset_polybius_entry(entry_vals))
-        reset_button.grid(row = 0, column = 0, columnspan = 10)
+        matrix_settings_frame = tk.Frame(settings_frame)
+        matrix_settings_frame.grid(row = 0, column = 0, columnspan = 10)
 
-        for row in range(size):
-            if row == size-1:
-                padding_value = (0,20)
-            else:
-                padding_value = 0
-            row_labels = tk.Label(settings_frame, text = str(row))
-            row_labels.grid(row = row+2, column = 0, pady = padding_value)
-        for col in range(size):
-            col_labels = tk.Label(settings_frame, text = str(col))
-            col_labels.grid(row = 1, column = col+2, padx = 5)
-
-        polybius_entry = []
-        for row in range(size):
-            if row == size-1:
-                padding_value = (0,20)
-            else:
-                padding_value = 0
-            for col in range(size):
-                entry = tk.Entry(settings_frame, width = 2, justify = "center")
-                entry.grid(row = row+2, column = col+2, pady = padding_value)
-                entry.bind("<KeyRelease>", limit_one_char)
-                entry.bind("<FocusOut>", limit_one_char)
-                polybius_entry.append(entry)
-        entry_vals["polybius_entry"] = polybius_entry
+        size_combobox = ttk.Combobox(matrix_settings_frame, values = ["5x5","6x6","7x7"], state = "readonly", width = 3)
+        size_combobox.set("5x5")
+        size_combobox.grid(row = 0, column = 0, columnspan = 5)
+        size_combobox.bind("<<ComboboxSelected>>", lambda event: generate_polybius_matrix(settings_frame, size_combobox, entry_vals))
+        reset_button = ttk.Button(matrix_settings_frame, text = "Resetare alfabet", command = lambda: reset_polybius_entry(entry_vals, size_combobox))
+        reset_button.grid(row = 0, column = 10, columnspan = 5)
+        generate_polybius_matrix(settings_frame, size_combobox, entry_vals)
 
 def verify_text(text):
 
@@ -123,8 +169,11 @@ def polybius_alphabet(entry_vals):
 
 def verify_polybius(input_text, alphabet):
 
+    input_text = input_text.lower()
+    alphabet = alphabet.lower()
     undefined_chars = set()
     special_cases = ["i", "j"]
+
     for char_text in input_text:
         if char_text in special_cases:
             if "i" not in alphabet and "j" not in alphabet:
@@ -184,7 +233,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
             msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", polybius.polybius(mesaj = input_text, alfabet = alphabet, operatie = 'criptare')) #aici apelezi functia
+        textbox2.insert("end-1c", polybius.polybius(mesaj = input_text, alfabet = alphabet, operatie = 'criptare'))
         textbox2.config(state = DISABLED)
 
 def decrypt(textbox1, textbox2, combobox, entry_vals):
@@ -229,11 +278,6 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
         if alphabet is None:
             msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
             return
-        undefined_chars = verify_polybius(input_text, alphabet)
-        if verify_polybius(input_text, alphabet):
-            msgbox.showerror("Eroare",
-                             f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
-            return
         textbox2.delete("1.0", "end-1c")
         textbox2.insert("end-1c", polybius.polybius(mesaj = input_text, alfabet = alphabet, operatie = 'decriptare'))
         textbox2.config(state = DISABLED)
@@ -248,8 +292,8 @@ def brute_force_caesar(textbox1, textbox2):
         return
     string_list = basic.cezar(input_text, None, 'spargere')
     textbox2.delete("1.0", "end-1c")
-    for i, string in enumerate(string_list, start=1):
-        textbox2.insert("end", f"{i}. {string}\n")
+    for i, strings in enumerate(string_list, start=1):
+        textbox2.insert("end", f"{i}. {strings}\n")
     textbox2.config(state = DISABLED)
 
 

@@ -8,7 +8,7 @@ class LabeledTextbox(scrolledtext.ScrolledText):
         self.frame = tk.Frame(master)
         self.label = tk.Label(self.frame, text = label_text)
         self.frame.grid(row = frame_row, column = frame_column, rowspan = rowspan, columnspan = columnspan, padx = 10, pady = 10)
-        super().__init__(self.frame, height=textbox_height, width=textbox_width)
+        super().__init__(self.frame, height=textbox_height, width=textbox_width, wrap = "word")
 
         if label_position == 'n':
             self.label.grid(row = 0, column = 0)
