@@ -27,6 +27,9 @@ def polybius(mesaj, alfabet, operatie):
 
         cod_caracter = {' ':(str(sqrt_lung_alfa + 1), str(sqrt_lung_alfa + 1))}
         for k in range(0, lung_alfa):
+            if alfabet[k] == ' ' and alfabet[k + 1] == ' ':
+                k += 2
+                continue
             cod_caracter[alfabet[k]] = (str(k // sqrt_lung_alfa), str(k % sqrt_lung_alfa))
 
         mesaj_criptat = ''
@@ -42,6 +45,9 @@ def polybius(mesaj, alfabet, operatie):
         k = 0
         for i in range(0, sqrt_lung_alfa):
             for j in range(0, sqrt_lung_alfa):
+                if alfabet[k] == ' ' and alfabet[k + 1] == ' ':
+                    k += 2
+                    continue
                 cod_pereche_cifre[i][j] = alfabet[k]
                 k += 1
 
@@ -64,7 +70,6 @@ def bifid(mesaj, alfabet, operatie):
     # in cazul in care 'j' nu este inclus in alfabet, acesta va fii considerat egal cu 'i'
     if 'j' not in alfabet and 'i' in alfabet:
         mesaj.translate({106 : 105})
-
 
     lung_alfa = len(alfabet)
     sqrt_lung_alfa = int(lung_alfa ** (1 / 2))
