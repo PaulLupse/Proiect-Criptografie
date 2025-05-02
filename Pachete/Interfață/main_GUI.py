@@ -317,7 +317,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
             msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", "Test1")
+        textbox2.insert("end-1c", Polybius.bifid(input_text, alphabet, 'criptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Hashing":
@@ -327,13 +327,13 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         if choice == "SHA-1":
 
             textbox2.delete("1.0", "end-1c")
-            textbox2.insert("end-1c", Hashing.sha_1(input_text))  #aici inlocuiesti
+            textbox2.insert("end-1c", Hashing.sha_1(input_text))
             textbox2.config(state = DISABLED)
 
         if choice == "SHA-256":
 
             textbox2.delete("1.0", "end-1c")
-            textbox2.insert("end-1c", Hashing.sha_256(input_text))    #aici inlocuiesti
+            textbox2.insert("end-1c", Hashing.sha_256(input_text))
             textbox2.config(state = DISABLED)
 
         if choice == "SHA-512":
@@ -412,7 +412,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
             msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", "Test2")
+        textbox2.insert("end-1c", Polybius.bifid(input_text, alphabet, 'decriptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Hashing":
