@@ -18,16 +18,19 @@ def polybius(mesaj, alfabet, operatie):
     mesaj = mesaj.lower()
     # in cazul in care 'j' nu este inclus in alfabet, acesta va fii considerat egal cu 'i'
     if 'j' not in alfabet and 'i' in alfabet:
-        mesaj.translate({106 : 105})
+        mesaj = mesaj.translate({106 : 105})
+    # in cazul in care spatiul nu este in alfabet, il ignoram
+    if ' ' not in alfabet:
+        mesaj = mesaj.replace(' ', '')
 
     lung_alfa = len(alfabet)
     sqrt_lung_alfa = int(lung_alfa**(1/2))
 
     if operatie == 'criptare':
 
-        cod_caracter = {' ':(str(sqrt_lung_alfa + 1), str(sqrt_lung_alfa + 1))}
+        cod_caracter = {}
         for k in range(0, lung_alfa):
-            if alfabet[k] == ' ' and alfabet[k + 1] == ' ':
+            if k != lung_alfa - 1 and alfabet[k] == ' ' and alfabet[k + 1] == ' ':
                 k += 2
                 continue
             cod_caracter[alfabet[k]] = (str(k // sqrt_lung_alfa), str(k % sqrt_lung_alfa))
@@ -41,11 +44,10 @@ def polybius(mesaj, alfabet, operatie):
     else:
 
         cod_pereche_cifre = np.zeros((sqrt_lung_alfa + 2, sqrt_lung_alfa + 2), dtype = str)
-        cod_pereche_cifre[sqrt_lung_alfa + 1][sqrt_lung_alfa + 1] = ' '
         k = 0
         for i in range(0, sqrt_lung_alfa):
             for j in range(0, sqrt_lung_alfa):
-                if alfabet[k] == ' ' and alfabet[k + 1] == ' ':
+                if k != lung_alfa - 1 and alfabet[k] == ' ' and alfabet[k + 1] == ' ':
                     k += 2
                     continue
                 cod_pereche_cifre[i][j] = alfabet[k]
@@ -69,7 +71,10 @@ def bifid(mesaj, alfabet, operatie):
 
     # in cazul in care 'j' nu este inclus in alfabet, acesta va fii considerat egal cu 'i'
     if 'j' not in alfabet and 'i' in alfabet:
-        mesaj.translate({106 : 105})
+        mesaj = mesaj.translate({106: 105})
+    # in cazul in care spatiul nu este in alfabet, il ignoram
+    if ' ' not in alfabet:
+        mesaj = mesaj.replace(' ', '')
 
     lung_alfa = len(alfabet)
     sqrt_lung_alfa = int(lung_alfa ** (1 / 2))
@@ -77,7 +82,11 @@ def bifid(mesaj, alfabet, operatie):
     # fiecarui caracter din alfabet ii atribuim un 'cod' (format din cate doua litere din tuplul cod),
     # dupa linia si coloana pe care se afla in matricea alfabetului
     cod_caracter = {}
+    cod_caracter = {}
     for k in range(0, lung_alfa):
+        if k != lung_alfa - 1 and alfabet[k] == ' ' and alfabet[k + 1] == ' ':
+            k += 2
+            continue
         cod_caracter[alfabet[k]] = (str(k // sqrt_lung_alfa), str(k % sqrt_lung_alfa))
 
     # inversa operatiei anterioare, atribuim fiecarei pereche de indecsi caracterul corespunzator
@@ -86,6 +95,9 @@ def bifid(mesaj, alfabet, operatie):
     k = 0
     for i in range(0, sqrt_lung_alfa):
         for j in range(0, sqrt_lung_alfa):
+            if k != lung_alfa - 1 and alfabet[k] == ' ' and alfabet[k + 1] == ' ':
+                k += 2
+                continue
             cod_pereche_cifre[i][j] = alfabet[k]
             k += 1
 
@@ -136,11 +148,6 @@ def bifid(mesaj, alfabet, operatie):
 
         return mesaj_decriptat
 
-
-# bifid in 3D
-def trifid(mesaj, strat1, strat2, strat3, operatie):
-    ...
-
 def __compara_coloane(col1, col2): # compara doua coloane, vectori de caractere din numpy
     ord1 = col1[-1]
     ord2 = col2[-1]
@@ -183,7 +190,10 @@ def adfgvx(mesaj, alfabet, cheie, operatie):
 
     # in cazul in care 'j' nu este inclus in alfabet, acesta va fii considerat egal cu 'i'
     if 'j' not in alfabet and 'i' in alfabet:
-        mesaj.translate({106 : 105})
+        mesaj = mesaj.translate({106: 105})
+    # in cazul in care spatiul nu este in alfabet, il ignoram
+    if ' ' not in alfabet:
+        mesaj = mesaj.replace(' ', '')
 
     lung_alfa = len(alfabet)
     sqrt_lung_alfa = int(lung_alfa ** (1 / 2))
@@ -205,7 +215,11 @@ def adfgvx(mesaj, alfabet, cheie, operatie):
     # dupa linia si coloana pe care se afla in matricea alfabetului
     cod_caracter = {}
     for k in range(0, lung_alfa):
+        if k != lung_alfa - 1 and alfabet[k] == ' ' and alfabet[k + 1] == ' ':
+            k += 2
+            continue
         cod_caracter[alfabet[k]] = (cod[k // sqrt_lung_alfa], cod[k % sqrt_lung_alfa])
+
 
     # inversa operatiei anterioare, atribuim fiecarei pereche de indecsi caracterul corespunzator
     # din matricea alfabetului
@@ -213,6 +227,9 @@ def adfgvx(mesaj, alfabet, cheie, operatie):
     k = 0
     for i in range(0, sqrt_lung_alfa):
         for j in range(0, sqrt_lung_alfa):
+            if k != lung_alfa - 1 and alfabet[k] == ' ' and alfabet[k + 1] == ' ':
+                k += 2
+                continue
             cod_pereche_cifre[i][j] = alfabet[k]
             k += 1
 
@@ -309,8 +326,7 @@ def adfgvx(mesaj, alfabet, cheie, operatie):
         return mesaj_decriptat
 
 if __name__ == '__main__':
-    a = adfgvx("zzgf vgxx azzg vadx dvd adfd adz gfgv vag ada afza adda gxga ddxd afav vfz dgd zafa vgxx", """NA1C3H8TB2OME5WRPD4F6G7I9J0KLQSUVXYZ.,?!         """.lower(),
-               'BOMBARDINOCROCODILO', 'decriptare')
+    a = polybius('a j', 'abcdefghiklmnopqrstuvwxyz0123456789 ', 'criptare')
     print(a)
 
 "La soare roata se mareste, la umbra numai carnea creste"

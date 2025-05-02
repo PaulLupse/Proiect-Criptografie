@@ -8,8 +8,9 @@ try:
 except:
     from . import CustomWidgets as Cw
 try:
-    from ..Algoritmi import basic
-    from ..Algoritmi import polybius
+    from ..Algoritmi import Basic
+    from ..Algoritmi import Polybius
+    from ..Algoritmi import Hashing
 except:
     print("IMPORTURILE RELATIVE FUNCTIONEAZA NUMA CAND RULEZI CODUL DIN main.py")
 
@@ -277,7 +278,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
             return
 
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", basic.cezar(input_text, shift_value, 'criptare'))
+        textbox2.insert("end-1c", Basic.cezar(input_text, shift_value, 'criptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Vigenère Cipher":
@@ -289,7 +290,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
             msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", basic.vignere(input_text, key_value, 'criptare'))
+        textbox2.insert("end-1c", Basic.vignere(input_text, key_value, 'criptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Polybius":
@@ -302,7 +303,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
             msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", polybius.polybius(mesaj = input_text, alfabet = alphabet, operatie = 'criptare'))
+        textbox2.insert("end-1c", Polybius.polybius(mesaj = input_text, alfabet = alphabet, operatie = 'criptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Bifid Cipher":
@@ -326,13 +327,13 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         if choice == "SHA-1":
 
             textbox2.delete("1.0", "end-1c")
-            textbox2.insert("end-1c", "SHA-1")  #aici inlocuiesti
+            textbox2.insert("end-1c", Hashing.sha_1(input_text))  #aici inlocuiesti
             textbox2.config(state = DISABLED)
 
         if choice == "SHA-256":
 
             textbox2.delete("1.0", "end-1c")
-            textbox2.insert("end-1c", "SHA-256")    #aici inlocuiesti
+            textbox2.insert("end-1c", Hashing.sha_256(input_text))    #aici inlocuiesti
             textbox2.config(state = DISABLED)
 
         if choice == "SHA-512":
@@ -370,7 +371,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
             msgbox.showerror("Eroare","Cheia trebuie să fie cuprinsă între -100 și 100!")
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", basic.cezar(input_text, shift_value, 'decriptare'))
+        textbox2.insert("end-1c", Basic.cezar(input_text, shift_value, 'decriptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Vigenère Cipher":
@@ -383,7 +384,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
             msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", basic.vignere(input_text, key_value, 'decriptare'))
+        textbox2.insert("end-1c", Basic.vignere(input_text, key_value, 'decriptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Polybius":
@@ -397,7 +398,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
             msgbox.showerror("Eroare", error)
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", polybius.polybius(mesaj = input_text, alfabet = alphabet, operatie = 'decriptare'))
+        textbox2.insert("end-1c", Polybius.polybius(mesaj = input_text, alfabet = alphabet, operatie = 'decriptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Bifid Cipher":
@@ -427,7 +428,7 @@ def brute_force_caesar(textbox1, textbox2):
     if not verify_text(input_text):
         msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
         return
-    string_list = basic.cezar(input_text, None, 'spargere')
+    string_list = Basic.cezar(input_text, None, 'spargere')
     textbox2.delete("1.0", "end-1c")
     for i, strings in enumerate(string_list, start=1):
         textbox2.insert("end", f"{i}. {strings}\n")
