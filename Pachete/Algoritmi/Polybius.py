@@ -19,14 +19,15 @@ def polybius(mesaj, alfabet, operatie):
     # in cazul in care 'j' nu este inclus in alfabet, acesta va fii considerat egal cu 'i'
     if 'j' not in alfabet and 'i' in alfabet:
         mesaj = mesaj.translate({106 : 105})
-    # in cazul in care spatiul nu este in alfabet, il ignoram
-    if ' ' not in alfabet:
-        mesaj = mesaj.replace(' ', '')
 
     lung_alfa = len(alfabet)
     sqrt_lung_alfa = int(lung_alfa**(1/2))
 
     if operatie == 'criptare':
+
+        # in cazul in care spatiul nu este in alfabet, il ignoram
+        if ' ' not in alfabet:
+            mesaj = mesaj.replace(' ', '')
 
         cod_caracter = {}
         for k in range(0, lung_alfa):
@@ -72,9 +73,6 @@ def bifid(mesaj, alfabet, operatie):
     # in cazul in care 'j' nu este inclus in alfabet, acesta va fii considerat egal cu 'i'
     if 'j' not in alfabet and 'i' in alfabet:
         mesaj = mesaj.translate({106: 105})
-    # in cazul in care spatiul nu este in alfabet, il ignoram
-    if ' ' not in alfabet:
-        mesaj = mesaj.replace(' ', '')
 
     lung_alfa = len(alfabet)
     sqrt_lung_alfa = int(lung_alfa ** (1 / 2))
@@ -105,6 +103,10 @@ def bifid(mesaj, alfabet, operatie):
         mesaj = __sterge_spatii(mesaj)
 
     if operatie == 'criptare':
+
+        # in cazul in care spatiul nu este in alfabet, il ignoram
+        if ' ' not in alfabet:
+            mesaj = mesaj.replace(' ', '')
 
         # inlocuim fiecare caracter cu codul corespunzator,
         # dar intai transcriem prima cifra din cod, apoi a doua
@@ -191,9 +193,6 @@ def adfgvx(mesaj, alfabet, cheie, operatie):
     # in cazul in care 'j' nu este inclus in alfabet, acesta va fii considerat egal cu 'i'
     if 'j' not in alfabet and 'i' in alfabet:
         mesaj = mesaj.translate({106: 105})
-    # in cazul in care spatiul nu este in alfabet, il ignoram
-    if ' ' not in alfabet:
-        mesaj = mesaj.replace(' ', '')
 
     lung_alfa = len(alfabet)
     sqrt_lung_alfa = int(lung_alfa ** (1 / 2))
@@ -235,9 +234,9 @@ def adfgvx(mesaj, alfabet, cheie, operatie):
 
     if operatie == 'criptare':
 
-        # daca spatiul nu este definit in alfabet, il eliminam din mesaj
+        # in cazul in care spatiul nu este in alfabet, il ignoram
         if ' ' not in alfabet:
-            mesaj = __sterge_spatii(mesaj)
+            mesaj = mesaj.replace(' ', '')
 
         mesaj_substituit = ''
 
@@ -326,7 +325,7 @@ def adfgvx(mesaj, alfabet, cheie, operatie):
         return mesaj_decriptat
 
 if __name__ == '__main__':
-    a = polybius('a j', 'abcdefghiklmnopqrstuvwxyz0123456789 ', 'criptare')
+    a = adfgvx('afdfgaagvgdfdadadg agagavgffvgfaffaag ffgdgfavaaaafggvgf gagagdagadavdaafgv aavaafdgafdgaafava', 'abcdefghiklmnopqrstuvwxyz', 'salut', 'decriptare')
     print(a)
 
-"La soare roata se mareste, la umbra numai carnea creste"
+"La soare roata se mareste la umbra numai carnea creste"
