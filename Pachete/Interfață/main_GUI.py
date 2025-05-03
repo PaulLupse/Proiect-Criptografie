@@ -30,7 +30,7 @@ def limit_one_char(event):
     if len(val) > 1:
         widget.delete(1, tk.END)
 
-def generate_polybius_matrix(settings_frame, size_combobox, entry_vals):
+def generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entry_vals):
 
     size = 5
     combobox_value = size_combobox.get()
@@ -45,31 +45,66 @@ def generate_polybius_matrix(settings_frame, size_combobox, entry_vals):
         if not isinstance(widget, tk.Frame):
             widget.destroy()
 
-    for row in range(size):
-        if row == size - 1:
-            padding_value = (0, 20)
-        else:
-            padding_value = 0
-        row_labels = tk.Label(settings_frame, text=str(row))
-        row_labels.grid(row=row + 2, column=0, pady=padding_value)
-    for col in range(size):
-        col_labels = tk.Label(settings_frame, text=str(col))
-        col_labels.grid(row=1, column=col + 2, padx=5)
+    if combobox.get() == "ADFGVX":
 
-    polybius_entry = []
-    for row in range(size):
-        if row == size - 1:
-            padding_value = (0, 20)
-        else:
-            padding_value = 0
+        index_list = ["A" , "D", "F", "G", "V", "X", "Z"]
+        index = 0
+        for row in range(size):
+            if row == size - 1:
+                padding_value = (0, 20)
+            else:
+                padding_value = 0
+            row_labels = tk.Label(settings_frame, text = index_list[index])
+            index += 1
+            row_labels.grid(row = row + 3, column = 0, pady = padding_value)
+        index = 0
         for col in range(size):
-            entry = tk.Entry(settings_frame, width=2, justify="center")
-            entry.grid(row = row + 2, column = col + 2, pady = padding_value)
-            entry.bind("<KeyRelease>", limit_one_char)
-            entry.bind("<FocusOut>", limit_one_char)
-            polybius_entry.append(entry)
-    entry_vals["polybius_entry"] = polybius_entry
-    reset_polybius_bifid_entry(entry_vals, size_combobox)
+            col_labels = tk.Label(settings_frame, text = index_list[index])
+            index += 1
+            col_labels.grid(row = 2, column = col + 3, padx = 5)
+
+        polybius_entry = []
+        for row in range(size):
+            if row == size - 1:
+                padding_value = (0, 20)
+            else:
+                padding_value = 0
+            for col in range(size):
+                entry = tk.Entry(settings_frame, width=2, justify="center")
+                entry.grid(row=row + 3, column=col + 3, pady=padding_value)
+                entry.bind("<KeyRelease>", limit_one_char)
+                entry.bind("<FocusOut>", limit_one_char)
+                polybius_entry.append(entry)
+        entry_vals["polybius_entry"] = polybius_entry
+        reset_polybius_bifid_entry(entry_vals, size_combobox)
+
+    else:
+
+        for row in range(size):
+            if row == size - 1:
+                padding_value = (0, 20)
+            else:
+                padding_value = 0
+            row_labels = tk.Label(settings_frame, text = str(row))
+            row_labels.grid(row = row + 2, column = 0, pady = padding_value)
+        for col in range(size):
+            col_labels = tk.Label(settings_frame, text = str(col))
+            col_labels.grid(row = 1, column = col + 2, padx = 5)
+
+        polybius_entry = []
+        for row in range(size):
+            if row == size - 1:
+                padding_value = (0, 20)
+            else:
+                padding_value = 0
+            for col in range(size):
+                entry = tk.Entry(settings_frame, width = 2, justify = "center")
+                entry.grid(row = row + 2, column = col + 2, pady = padding_value)
+                entry.bind("<KeyRelease>", limit_one_char)
+                entry.bind("<FocusOut>", limit_one_char)
+                polybius_entry.append(entry)
+        entry_vals["polybius_entry"] = polybius_entry
+        reset_polybius_bifid_entry(entry_vals, size_combobox)
 
 def reset_polybius_bifid_entry(entry_vals, size_combobox):
 
@@ -137,11 +172,43 @@ def update_settings(combobox, settings_frame, entry_vals):
         size_combobox = ttk.Combobox(matrix_settings_frame, values = ["5x5","6x6","7x7"], state = "readonly", width = 3)
         size_combobox.set("5x5")
         size_combobox.grid(row = 0, column = 0, columnspan = 5)
-        size_combobox.bind("<<ComboboxSelected>>", lambda event: generate_polybius_matrix(settings_frame, size_combobox, entry_vals))
+        size_combobox.bind("<<ComboboxSelected>>", lambda event: generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entry_vals))
         entry_vals["size_combobox"] = size_combobox
         reset_button = ttk.Button(matrix_settings_frame, text = "Resetare alfabet", command = lambda: reset_polybius_bifid_entry(entry_vals, size_combobox))
         reset_button.grid(row = 0, column = 10, columnspan = 5)
-        generate_polybius_matrix(settings_frame, size_combobox, entry_vals)
+        generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entry_vals)
+
+    elif selected_algorithm == "Bifid Cipher":
+
+        matrix_settings_frame = tk.Frame(settings_frame)
+        matrix_settings_frame.grid(row = 0, column = 0, columnspan = 10)
+
+        size_combobox = ttk.Combobox(matrix_settings_frame, values = ["5x5", "6x6", "7x7"], state = "readonly", width = 3)
+        size_combobox.set("5x5")
+        size_combobox.grid(row = 0, column = 0, columnspan = 5)
+        size_combobox.bind("<<ComboboxSelected>>", lambda event: generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entry_vals))
+        entry_vals["size_combobox"] = size_combobox
+        reset_button = ttk.Button(matrix_settings_frame, text = "Resetare alfabet", command = lambda: reset_polybius_bifid_entry(entry_vals, size_combobox))
+        reset_button.grid(row = 0, column = 10, columnspan = 5)
+        generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entry_vals)
+
+    elif selected_algorithm == "ADFGVX":
+
+        matrix_settings_frame = tk.Frame(settings_frame)
+        matrix_settings_frame.grid(row = 0, column = 0, columnspan = 10)
+
+        size_combobox = ttk.Combobox(matrix_settings_frame, values = ["5x5", "6x6", "7x7"], state = "readonly", width = 3)
+        size_combobox.set("5x5")
+        size_combobox.grid(row = 0, column = 0, columnspan = 5)
+        size_combobox.bind("<<ComboboxSelected>>", lambda event: generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entry_vals))
+        entry_vals["size_combobox"] = size_combobox
+        reset_button = ttk.Button(matrix_settings_frame, text = "Resetare alfabet", command = lambda: reset_polybius_bifid_entry(entry_vals, size_combobox))
+        reset_button.grid(row = 0, column = 10, columnspan = 5)
+
+        generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entry_vals)
+
+        adfgvx_textbox = Cw.LabeledTextbox(settings_frame, "Cheie:","n", 1, 15, 1,0,1,10)
+        entry_vals["adfgvx_textbox"] = adfgvx_textbox
 
     elif selected_algorithm == "Hashing":
 
@@ -159,20 +226,6 @@ def update_settings(combobox, settings_frame, entry_vals):
         md5_radiobutton.grid(row=4, column=1, sticky="w")
 
         entry_vals["hashing_choice"] = hashing_choice
-
-    elif selected_algorithm == "Bifid Cipher":
-
-        matrix_settings_frame = tk.Frame(settings_frame)
-        matrix_settings_frame.grid(row = 0, column = 0, columnspan = 10)
-
-        size_combobox = ttk.Combobox(matrix_settings_frame, values = ["5x5", "6x6", "7x7"], state = "readonly", width = 3)
-        size_combobox.set("5x5")
-        size_combobox.grid(row = 0, column = 0, columnspan = 5)
-        size_combobox.bind("<<ComboboxSelected>>", lambda event: generate_polybius_matrix(settings_frame, size_combobox, entry_vals))
-        entry_vals["size_combobox"] = size_combobox
-        reset_button = ttk.Button(matrix_settings_frame, text = "Resetare alfabet", command = lambda: reset_polybius_bifid_entry(entry_vals, size_combobox))
-        reset_button.grid(row = 0, column = 10, columnspan = 5)
-        generate_polybius_matrix(settings_frame, size_combobox, entry_vals)
 
 def verify_text(text):
 
@@ -194,7 +247,7 @@ def verify_textbox_vigenere(text):
             return False
     return True
 
-def polybius_bifid_alphabet(entry_vals):
+def polybius_bifid_adfgvx_alphabet(entry_vals):
 
     alphabet = ""
     duplicate_values = set()
@@ -209,7 +262,7 @@ def polybius_bifid_alphabet(entry_vals):
             alphabet += value
     return alphabet
 
-def verify_polybius_bifid(input_text, alphabet):
+def verify_polybius_bifid_adfgvx(input_text, alphabet):
 
     input_text = input_text.lower()
     alphabet = alphabet.lower()
@@ -254,6 +307,31 @@ def verify_polybius_decrypt(input_text, entry_vals):
             if int(digit) < 0 or int(digit) > 6:
                 return "Cifrele trebuie să fie cuprinse între 0 și 6!"
 
+def verify_adfgvx_crypt(input_text, alphabet, key):
+
+    ok = False
+    for char in alphabet:
+        if char == " ":
+            ok = True
+
+    if ok:
+        if len(input_text) < len(key) // 2:
+            return "Lungimea mesajului (cu spații) trebuie să fie cel puțin jumătate din lungimea cheii!"
+    else:
+        input_text = input_text.replace(" ","")
+        if len(input_text) < len(key) // 2:
+            return "Lungimea mesajului (fără spații) trebuie să fie cel puțin jumătate din lungimea cheii!"
+
+def verify_adfgvx_decrypt(input_text, key):
+
+    adfgvx_decrypt_list = ["a", "d", "f", "g", "v", "x", "z", " "]
+    for char in input_text:
+        if char not in adfgvx_decrypt_list:
+            return "Mesajul poate fi format doar din {'A', 'D', 'F', 'G', 'V', 'X', 'Z'} și spații!"
+
+    input_text_words = input_text.split()
+    if len(input_text_words) != len(key):
+        return "Numărul de cuvinte din mesaj trebuie să fie egal cu lungimea cheii!"
 
 def crypt(textbox1, textbox2, combobox, entry_vals):
 
@@ -294,12 +372,12 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Polybius":
-        alphabet = polybius_bifid_alphabet(entry_vals)
+        alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
         if alphabet is None:
             msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
             return
-        undefined_chars = verify_polybius_bifid(input_text, alphabet)
-        if verify_polybius_bifid(input_text, alphabet):
+        undefined_chars = verify_polybius_bifid_adfgvx(input_text, alphabet)
+        if verify_polybius_bifid_adfgvx(input_text, alphabet):
             msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
             return
         textbox2.delete("1.0", "end-1c")
@@ -308,16 +386,34 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
 
     elif selected_algorithm == "Bifid Cipher":
 
-        alphabet = polybius_bifid_alphabet(entry_vals)
+        alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
         if alphabet is None:
             msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
             return
-        undefined_chars = verify_polybius_bifid(input_text, alphabet)
-        if verify_polybius_bifid(input_text, alphabet):
+        undefined_chars = verify_polybius_bifid_adfgvx(input_text, alphabet)
+        if verify_polybius_bifid_adfgvx(input_text, alphabet):
             msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
             return
         textbox2.delete("1.0", "end-1c")
         textbox2.insert("end-1c", Polybius.bifid(input_text, alphabet, 'criptare'))
+        textbox2.config(state = DISABLED)
+
+    elif selected_algorithm == "ADFGVX":
+        key = entry_vals["adfgvx_textbox"].get("1.0", "end-1c")
+        alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
+        if alphabet is None:
+            msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
+            return
+        undefined_chars = verify_polybius_bifid_adfgvx(input_text, alphabet)
+        if verify_polybius_bifid_adfgvx(input_text, alphabet):
+            msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
+            return
+        error = verify_adfgvx_crypt(input_text, alphabet, key)
+        if error:
+            msgbox.showerror("Eroare", error)
+            return
+        textbox2.delete("1.0", "end-1c")
+        textbox2.insert("end-1c", Polybius.adfgvx(input_text, alphabet, key, "criptare"))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Hashing":
@@ -389,7 +485,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
 
     elif selected_algorithm == "Polybius":
 
-        alphabet = polybius_bifid_alphabet(entry_vals)
+        alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
         if alphabet is None:
             msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
             return
@@ -403,16 +499,34 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
 
     elif selected_algorithm == "Bifid Cipher":
 
-        alphabet = polybius_bifid_alphabet(entry_vals)
+        alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
         if alphabet is None:
             msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
             return
-        undefined_chars = verify_polybius_bifid(input_text, alphabet)
-        if verify_polybius_bifid(input_text, alphabet):
+        undefined_chars = verify_polybius_bifid_adfgvx(input_text, alphabet)
+        if verify_polybius_bifid_adfgvx(input_text, alphabet):
             msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
             return
         textbox2.delete("1.0", "end-1c")
         textbox2.insert("end-1c", Polybius.bifid(input_text, alphabet, 'decriptare'))
+        textbox2.config(state = DISABLED)
+
+    elif selected_algorithm == "ADFGVX":
+        key = entry_vals["adfgvx_textbox"].get("1.0", "end-1c")
+        alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
+        if alphabet is None:
+            msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
+            return
+        undefined_chars = verify_polybius_bifid_adfgvx(input_text, alphabet)
+        if verify_polybius_bifid_adfgvx(input_text, alphabet):
+            msgbox.showerror("Eroare",f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
+            return
+        error = verify_adfgvx_decrypt(input_text, key)
+        if error:
+            msgbox.showerror("Eroare", error)
+            return
+        textbox2.delete("1.0", "end-1c")
+        textbox2.insert("end-1c", Polybius.adfgvx(input_text, alphabet, key, "decriptare"))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Hashing":
@@ -457,7 +571,7 @@ def main():
     settings_frame = tk.Frame(root)
     settings_frame.grid(row = 1, column = 1, sticky = "n")
 
-    combobox = ttk.Combobox(options_frame, values = ["Caesar Cipher","Vigenère Cipher", "Polybius", "Bifid Cipher", "Hashing"], state = "readonly")
+    combobox = ttk.Combobox(options_frame, values = ["Caesar Cipher","Vigenère Cipher", "Polybius", "Bifid Cipher", "ADFGVX", "Hashing"], state = "readonly")
     combobox.set("Alege algoritmul")
     combobox.grid(row = 0, column = 0, columnspan = 2)
     combobox.bind("<<ComboboxSelected>>", lambda event: update_settings(combobox, settings_frame, entry_vals))
