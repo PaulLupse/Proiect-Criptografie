@@ -1,4 +1,5 @@
 import numpy as np
+from BitVector import BitVector as Bv
 
 def __st_rot(numar, nr_pos):
     bin_numar = bin(numar)[2::]
@@ -55,11 +56,17 @@ def get_s_box_value(octet):
     rez = int(s_box[linie * 16 + coloana])
     return rez
 
+def get_inv_s_box_value(octet):
+    linie = octet // 16
+    coloana = octet % 16
+    rez = int(s_box_inv[linie * 16 + coloana])
+    return rez
+
 constanta_runda = (0x00000000, 0x01000000, 0x02000000, 0x04000000,
                    0x08000000,	0x10000000,	0x20000000,	0x40000000,
                    0x80000000,	0x1B000000,	0x36000000)
 
-def g1(cuvant, runda):
+def g(cuvant, runda):
 
     octet1 = get_s_box_value(cuvant % 16**2)
     octet2 = get_s_box_value((cuvant % 16**4) // (16 ** 2))
@@ -82,10 +89,20 @@ def __substituire(stare_mesaj):
         for i in range(0, 4):
             stare_mesaj[i][j] = get_s_box_value(stare_mesaj[i][j])
 
+def __inv_substituire(stare_mesaj):
+    for j in range(0, 4):
+        for i in range(0, 4):
+            stare_mesaj[i][j] = get_inv_s_box_value(stare_mesaj[i][j])
+
 def __schimba_linii(stare_mesaj):
     stare_mesaj[1][0], stare_mesaj[1][1], stare_mesaj[1][2], stare_mesaj[1][3] = stare_mesaj[1][1], stare_mesaj[1][2], stare_mesaj[1][3], stare_mesaj[1][0]
     stare_mesaj[2][0], stare_mesaj[2][1], stare_mesaj[2][2], stare_mesaj[2][3] = stare_mesaj[2][2], stare_mesaj[2][3], stare_mesaj[2][0], stare_mesaj[2][1]
     stare_mesaj[3][0], stare_mesaj[3][1], stare_mesaj[3][2], stare_mesaj[3][3] = stare_mesaj[3][3], stare_mesaj[3][0], stare_mesaj[3][1], stare_mesaj[3][2]
+
+def __inv_schimba_linii(stare_mesaj):
+    stare_mesaj[1][0], stare_mesaj[1][1], stare_mesaj[1][2], stare_mesaj[1][3] = stare_mesaj[1][3], stare_mesaj[1][0], stare_mesaj[1][1], stare_mesaj[1][2]
+    stare_mesaj[2][0], stare_mesaj[2][1], stare_mesaj[2][2], stare_mesaj[2][3] = stare_mesaj[2][2], stare_mesaj[2][3], stare_mesaj[2][0], stare_mesaj[2][1]
+    stare_mesaj[3][0], stare_mesaj[3][1], stare_mesaj[3][2], stare_mesaj[3][3] = stare_mesaj[3][1], stare_mesaj[3][2], stare_mesaj[3][3], stare_mesaj[3][0]
 
 def __adauga_cheie(stare_mesaj, cuvinte, runda):
     for j in range(0, 4):
@@ -93,9 +110,43 @@ def __adauga_cheie(stare_mesaj, cuvinte, runda):
         for i in range(0, 4):
             stare_mesaj[i][j] = stare_mesaj[i][j] ^ octeti[i]
 
-matrice_mixare = np.array([[0x2, 0x3, 0x1, 0x1],[0x1, 0x2, 0x3, 0x1],[0x1, 0x1, 0x2, 0x3],[0x3, 0x1, 0x1, 0x2]])
+MOD = Bv(bitstring='100011011')
+matrice_mixare = np.array([[0x2, 0x3, 0x1, 0x1],[0x1, 0x2, 0x3, 0x1],[0x1, 0x1, 0x2, 0x3],[0x3, 0x1, 0x1, 0x2]], dtype = int)
+
 def __mixeaza_coloane(stare_mesaj):
-    return np.matmul(stare_mesaj, matrice_mixare)
+
+    rezultat = np.zeros((4, 4), dtype = int)
+    for i in range(4):
+        for j in range(4):
+            rez = 0
+            for k in range(4):
+                m = Bv(intVal = matrice_mixare[i][k])
+                s = Bv(intVal = stare_mesaj[k][j])
+                rezultat_produs = int(m.gf_multiply_modular(s, MOD, 8))
+                rez ^= rezultat_produs
+            rezultat[i][j] = rez
+
+    return rezultat
+
+matrice_mixare_inv = np.array([[0x0E, 0x0B, 0x0D, 0x09],
+[0x09, 0x0E, 0x0B, 0x0D],
+[0x0D, 0x09, 0x0E, 0x0B],
+[0x0B, 0x0D, 0x09, 0x0E]], dtype = int)
+
+def __inv_mixeaza_coloane(stare_mesaj):
+
+    rezultat = np.zeros((4, 4), dtype = int)
+    for i in range(4):
+        for j in range(4):
+            rez = 0
+            for k in range(4):
+                m = Bv(intVal = matrice_mixare_inv[i][k])
+                s = Bv(intVal = stare_mesaj[k][j])
+                rezultat_produs = int(m.gf_multiply_modular(s, MOD, 8))
+                rez ^= rezultat_produs
+            rezultat[i][j] = rez
+
+    return rezultat
 
 def aes_128(mesaj, cheie, operatie):
 
@@ -113,7 +164,7 @@ def aes_128(mesaj, cheie, operatie):
     # expansiunea cheii
     for runda in range(1, 11):
         i = runda * 4
-        cuvant0 = cuvinte[i - 4] ^ g1(cuvinte[i - 1], runda)
+        cuvant0 = cuvinte[i - 4] ^ g(cuvinte[i - 1], runda)
         cuvant1 = cuvant0 ^ cuvinte[i - 3]
         cuvant2 = cuvant1 ^ cuvinte[i - 2]
         cuvant3 = cuvant2 ^ cuvinte[i - 1]
@@ -126,9 +177,12 @@ def aes_128(mesaj, cheie, operatie):
     # criptarea propriu-zisa
 
     if operatie == 'criptare':
+
+
+
         octeti_mesaj = [ord(caracter) for caracter in mesaj]
 
-        stare_mesaj = np.zeros((4,4), dtype = int) # matrice care memoreaza toti 16 octeti ai mesajului
+        stare_mesaj = np.zeros((4, 4), dtype=int)  # matrice care memoreaza toti 16 octeti ai mesajului
 
         index_octeti = 0
         for j in range(0, 4):
@@ -152,9 +206,47 @@ def aes_128(mesaj, cheie, operatie):
         mesaj_criptat = ''
         for j in range(0, 4):
             for i in range(0, 4):
+                if stare_mesaj[i][j] < 16:
+                    mesaj_criptat += '0'
                 mesaj_criptat += hex(stare_mesaj[i][j])[2::]
 
         return mesaj_criptat
+
+    else:
+
+        octeti_mesaj = []
+        for i in range(0, 32, 2):
+            octeti_mesaj.append(int(mesaj[i:i+2:], 16))
+
+        stare_mesaj = np.zeros((4, 4), dtype=int)  # matrice care memoreaza toti 16 octeti ai mesajului
+
+        index_octeti = 0
+        for j in range(0, 4):
+            for i in range(0, 4):
+                stare_mesaj[i][j] = octeti_mesaj[index_octeti]
+                index_octeti += 1
+
+        __adauga_cheie(stare_mesaj, cuvinte, 10)
+
+        for runda in range(9, 0, -1):
+
+            __inv_schimba_linii(stare_mesaj)
+            __inv_substituire(stare_mesaj)
+            __adauga_cheie(stare_mesaj, cuvinte, runda)
+            stare_mesaj = __inv_mixeaza_coloane(stare_mesaj)
+
+        __inv_schimba_linii(stare_mesaj)
+        __inv_substituire(stare_mesaj)
+        __adauga_cheie(stare_mesaj, cuvinte, 0)
+
+        mesaj_decriptat = ''
+        for j in range(0, 4):
+            for i in range(0, 4):
+                if stare_mesaj[i][j] < 16:
+                    mesaj_decriptat += '0'
+                mesaj_decriptat += chr(int(stare_mesaj[i][j]))
+
+        return mesaj_decriptat
 
 
 
@@ -163,8 +255,14 @@ def aes_128(mesaj, cheie, operatie):
 
 
 if __name__ == '__main__':
-    a = aes_128('Two One Nine Two', '54 68 61 74 73 20 6D 79 20 4B 75 6E 67 20 46 75'.lower().replace(' ', ''), 'criptare')
+
+    a = aes_128('La soare roata se mareste, la umbra numai carnea creste. Si somn e carnea, se dezumfla, dar frig si umbra iar o umfla.', '54 68 61 74 73 20 6D 79 20 4B 75 6E 67 20 46 75'.lower().replace(' ', ''), 'criptare')
     print(a)
-    #print(g(2857680095, 1))
-    #a = np.array([[1, 2, 3, 4],[5, 6, 7, 8],[9, 10, 11, 12],[13, 14, 15, 16]])
-    #__schimba_linii(a)
+    '''a = np.array([[0x63, 0xEB, 0x9F, 0xA0],
+                  [0x2F, 0x93, 0x92, 0xC0],
+                  [0xAF, 0xC7, 0xAB, 0x30],
+                  [0xA2, 0x20, 0xCB, 0x2B]])'''
+
+#Two one nine two
+#29c3505f571420f6402299b31a02d73a
+#29C3505F571420F6402299B31A02D73A
