@@ -148,103 +148,130 @@ def __inv_mixeaza_coloane(stare_mesaj):
 
     return rezultat
 
-def aes_128(mesaj, cheie, operatie):
-
-    #starea initiala
-
-    lung_cheie = 32 # 128 bit
-    cuvinte = []
-
-    # impartim mesajul in 4 cuvinte, fiecare cuvant avand 32 biti (4 octeti, 8 valori hexa)
-
-    for i in range(0, 32, 8):
-        cuvant = int(cheie[i:i+8:], 16)
-        cuvinte.append(cuvant)
-
-    # expansiunea cheii
+# 1 cuvant == 4 octeti
+def __expansioneaza_cheia(cuvinte_cheie):
     for runda in range(1, 11):
         i = runda * 4
-        cuvant0 = cuvinte[i - 4] ^ g(cuvinte[i - 1], runda)
-        cuvant1 = cuvant0 ^ cuvinte[i - 3]
-        cuvant2 = cuvant1 ^ cuvinte[i - 2]
-        cuvant3 = cuvant2 ^ cuvinte[i - 1]
+        cuvant0 = cuvinte_cheie[i - 4] ^ g(cuvinte_cheie[i - 1], runda)
+        cuvant1 = cuvant0 ^ cuvinte_cheie[i - 3]
+        cuvant2 = cuvant1 ^ cuvinte_cheie[i - 2]
+        cuvant3 = cuvant2 ^ cuvinte_cheie[i - 1]
 
-        cuvinte.append(cuvant0)
-        cuvinte.append(cuvant1)
-        cuvinte.append(cuvant2)
-        cuvinte.append(cuvant3)
+        cuvinte_cheie.append(cuvant0)
+        cuvinte_cheie.append(cuvant1)
+        cuvinte_cheie.append(cuvant2)
+        cuvinte_cheie.append(cuvant3)
+
+# padding (pkcs#7)
+def __adauga_padding(octeti_mesaj):
+    if len(octeti_mesaj) % 16 == 0:
+        for i in range(0, 16):
+            octeti_mesaj.append(16)
+    else:
+        pad = 16 - len(octeti_mesaj) % 16
+        for i in range(0, pad):
+            octeti_mesaj.append(pad)
+
+def __sterge_padding(mesaj):
+
+    lung_mesaj = mesaj
+    lung_padding = mesaj[-1]
+    for i in range(lung_mesaj):
+        ...
+
+# aes-128, modul EBC cu padding pkcs#7
+def aes_128(mesaj, cheie, operatie):
+
+    cuvinte_cheie = []
+    # initial, impartim cheia in 4 cuvinte, fiecare cuvant avand 32 biti (4 octeti, 8 valori hexa)
+    # apoi o expansionam
+    for i in range(0, 32, 8):
+        cuvant = int(cheie[i:i + 8:], 16)
+        cuvinte_cheie.append(cuvant)
+    __expansioneaza_cheia(cuvinte_cheie)
 
     # criptarea propriu-zisa
-
     if operatie == 'criptare':
 
-
-
         octeti_mesaj = [ord(caracter) for caracter in mesaj]
+        __adauga_padding(octeti_mesaj)
 
-        stare_mesaj = np.zeros((4, 4), dtype=int)  # matrice care memoreaza toti 16 octeti ai mesajului
+        blocuri_mesaj = []
+        for i in range(0, len(octeti_mesaj), 16): # impartim mesajul in blocuri de cate 16 octeti (16 caractere)
+            blocuri_mesaj.append(octeti_mesaj[i:i+16:])
 
-        index_octeti = 0
-        for j in range(0, 4):
-            for i in range(0, 4):
-                stare_mesaj[i][j] = octeti_mesaj[index_octeti]
-                index_octeti += 1
+        mesaj_criptat = ''
+        for bloc_mesaj in blocuri_mesaj: # aplicam criptare pt fiecare bloc de 16 octeti
+            stare_mesaj = np.zeros((4, 4), dtype=int)  # matrice care memoreaza toti 16 octeti ai mesajului,
+                                                            # care isi schimba valorile pe parcurs
+            index_octeti = 0
+            for j in range(0, 4):
+                for i in range(0, 4):
+                    stare_mesaj[i][j] = bloc_mesaj[index_octeti]
+                    index_octeti += 1
 
-        __adauga_cheie(stare_mesaj, cuvinte, 0)
+            __adauga_cheie(stare_mesaj, cuvinte_cheie, 0)
 
-        for runda in range(1, 10):
+            for runda in range(1, 10):
+
+                __substituire(stare_mesaj)
+                __schimba_linii(stare_mesaj)
+                stare_mesaj = __mixeaza_coloane(stare_mesaj)
+                __adauga_cheie(stare_mesaj, cuvinte_cheie, runda)
 
             __substituire(stare_mesaj)
             __schimba_linii(stare_mesaj)
-            stare_mesaj = __mixeaza_coloane(stare_mesaj)
-            __adauga_cheie(stare_mesaj, cuvinte, runda)
+            __adauga_cheie(stare_mesaj, cuvinte_cheie, 10)
 
-        __substituire(stare_mesaj)
-        __schimba_linii(stare_mesaj)
-        __adauga_cheie(stare_mesaj, cuvinte, 10)
-
-        mesaj_criptat = ''
-        for j in range(0, 4):
-            for i in range(0, 4):
-                if stare_mesaj[i][j] < 16:
-                    mesaj_criptat += '0'
-                mesaj_criptat += hex(stare_mesaj[i][j])[2::]
+            for j in range(0, 4):
+                for i in range(0, 4):
+                    if stare_mesaj[i][j] < 16:
+                        mesaj_criptat += '0'
+                    mesaj_criptat += hex(stare_mesaj[i][j])[2::]
+            mesaj_criptat += ' '
 
         return mesaj_criptat
 
     else:
 
+        mesaj = mesaj.lower().replace(' ', '')
+
         octeti_mesaj = []
-        for i in range(0, 32, 2):
+        for i in range(0, len(mesaj), 2):
             octeti_mesaj.append(int(mesaj[i:i+2:], 16))
 
-        stare_mesaj = np.zeros((4, 4), dtype=int)  # matrice care memoreaza toti 16 octeti ai mesajului
+        blocuri_mesaj = []
+        for i in range(0, len(octeti_mesaj), 16):  # impartim mesajul in blocuri de cate 16 octeti (16 caractere)
+            blocuri_mesaj.append(octeti_mesaj[i:i + 16:])
 
-        index_octeti = 0
-        for j in range(0, 4):
-            for i in range(0, 4):
-                stare_mesaj[i][j] = octeti_mesaj[index_octeti]
-                index_octeti += 1
+        mesaj_decriptat = ''
+        for bloc_mesaj in blocuri_mesaj:
+            stare_mesaj = np.zeros((4, 4), dtype=int)  # matrice care memoreaza toti 16 octeti ai mesajului
 
-        __adauga_cheie(stare_mesaj, cuvinte, 10)
+            index_octeti = 0
+            for j in range(0, 4):
+                for i in range(0, 4):
+                    stare_mesaj[i][j] = bloc_mesaj[index_octeti]
+                    index_octeti += 1
 
-        for runda in range(9, 0, -1):
+            __adauga_cheie(stare_mesaj, cuvinte_cheie, 10)
+
+            for runda in range(9, 0, -1):
+
+                __inv_schimba_linii(stare_mesaj)
+                __inv_substituire(stare_mesaj)
+                __adauga_cheie(stare_mesaj, cuvinte_cheie, runda)
+                stare_mesaj = __inv_mixeaza_coloane(stare_mesaj)
 
             __inv_schimba_linii(stare_mesaj)
             __inv_substituire(stare_mesaj)
-            __adauga_cheie(stare_mesaj, cuvinte, runda)
-            stare_mesaj = __inv_mixeaza_coloane(stare_mesaj)
+            __adauga_cheie(stare_mesaj, cuvinte_cheie, 0)
 
-        __inv_schimba_linii(stare_mesaj)
-        __inv_substituire(stare_mesaj)
-        __adauga_cheie(stare_mesaj, cuvinte, 0)
-
-        mesaj_decriptat = ''
-        for j in range(0, 4):
-            for i in range(0, 4):
-                if stare_mesaj[i][j] < 16:
-                    mesaj_decriptat += '0'
-                mesaj_decriptat += chr(int(stare_mesaj[i][j]))
+            for j in range(0, 4):
+                for i in range(0, 4):
+                    if stare_mesaj[i][j] > 16:
+                        mesaj_decriptat += chr(int(stare_mesaj[i][j]))
+            mesaj_decriptat += ''
 
         return mesaj_decriptat
 
@@ -256,7 +283,7 @@ def aes_128(mesaj, cheie, operatie):
 
 if __name__ == '__main__':
 
-    a = aes_128('La soare roata se mareste, la umbra numai carnea creste. Si somn e carnea, se dezumfla, dar frig si umbra iar o umfla.', '54 68 61 74 73 20 6D 79 20 4B 75 6E 67 20 46 75'.lower().replace(' ', ''), 'criptare')
+    a = aes_128('64bb939bc5282990321f47e44a2a4b2b a2c2ecec95966f1b7c11299c78234a79 e0d7db79833623b59cb7e8c40687313d 824b05102459890afabd3b6886843bc1', '54 68 61 74 73 20 6D 79 20 4B 75 6E 67 20 46 75'.lower().replace(' ', ''), 'decriptare')
     print(a)
     '''a = np.array([[0x63, 0xEB, 0x9F, 0xA0],
                   [0x2F, 0x93, 0x92, 0xC0],
