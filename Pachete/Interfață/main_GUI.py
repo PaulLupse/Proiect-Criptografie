@@ -227,6 +227,20 @@ def update_settings(combobox, settings_frame, entry_vals):
 
         entry_vals["hashing_choice"] = hashing_choice
 
+    elif selected_algorithm == "AES":
+
+        aes_combobox = ttk.Combobox(settings_frame, values=["AES-128", "AES-256"], state="readonly", width=9)
+        aes_combobox.set("AES-128")
+        aes_combobox.grid(row=0, column=0, columnspan=5)
+        aes_textbox = Cw.LabeledTextbox(settings_frame, "Cheie de criptare:", "n", 3, 15, 1, 0, 1, 1)
+        entry_vals["aes_combobox"] = aes_combobox
+        entry_vals["aes_textbox"] = aes_textbox
+
+    elif selected_algorithm == "RC4":
+
+        rc4_textbox = Cw.LabeledTextbox(settings_frame, "Cheie de criptare:", "n", 3, 15, 0, 0, 1, 1)
+        entry_vals["rc4_textbox"] = rc4_textbox
+
 def verify_text(text):
 
     for char in text:
@@ -444,6 +458,12 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
             textbox2.insert("end-1c", "MD5")    #aici inlocuiesti
             textbox2.config(state = DISABLED)
 
+    elif selected_algorithm == "AES":
+        ...
+
+    elif selected_algorithm == "RC4":
+        ...
+
 def decrypt(textbox1, textbox2, combobox, entry_vals):
 
     selected_algorithm = combobox.get()
@@ -534,6 +554,12 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
         msgbox.showerror("Eroare", "Nu există decriptare pentru algoritmii de hashing!")
         return
 
+    elif selected_algorithm == "AES":
+        ...
+
+    elif selected_algorithm == "RC4":
+        ...
+
 def brute_force_caesar(textbox1, textbox2):
 
     input_text = textbox1.get("1.0", "end-1c")
@@ -571,7 +597,7 @@ def main():
     settings_frame = tk.Frame(root)
     settings_frame.grid(row = 1, column = 1, sticky = "n")
 
-    combobox = ttk.Combobox(options_frame, values = ["Caesar Cipher","Vigenère Cipher", "Polybius", "Bifid Cipher", "ADFGVX", "Hashing"], state = "readonly")
+    combobox = ttk.Combobox(options_frame, values = ["Caesar Cipher","Vigenère Cipher", "Polybius", "Bifid Cipher", "ADFGVX", "Hashing", "AES", "RC4"], state = "readonly")
     combobox.set("Alege algoritmul")
     combobox.grid(row = 0, column = 0, columnspan = 2)
     combobox.bind("<<ComboboxSelected>>", lambda event: update_settings(combobox, settings_frame, entry_vals))
