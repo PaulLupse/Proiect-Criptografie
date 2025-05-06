@@ -2,10 +2,11 @@ import numpy as np
 from BitVector import BitVector as Bv
 
 def __st_rot(numar, nr_pos):
+
     bin_numar = bin(numar)[2::]
-    bin_numar = '0' * (32 - len(bin_numar)) + bin_numar
+    bin_numar = ('0' * (32 - len(bin_numar))) + bin_numar
     bin_numar = bin_numar[nr_pos::] + bin_numar[:nr_pos:]
-    return np.uint32(int(bin_numar, 2))
+    return int(bin_numar, 2)
 
 def __dr_rot(numar, nr_pos):
     bin_numar = bin(numar)[2::]
@@ -66,14 +67,19 @@ constanta_runda = (0x00000000, 0x01000000, 0x02000000, 0x04000000,
                    0x08000000,	0x10000000,	0x20000000,	0x40000000,
                    0x80000000,	0x1B000000,	0x36000000)
 
-def g(cuvant, runda):
+def __substituire_cuvant(cuvant):
 
-    octet1 = get_s_box_value(cuvant % 16**2)
-    octet2 = get_s_box_value((cuvant % 16**4) // (16 ** 2))
-    octet3 = get_s_box_value((cuvant % 16**6) // (16 ** 4))
+    octet1 = get_s_box_value(cuvant % 16 ** 2)
+    octet2 = get_s_box_value((cuvant % 16 ** 4) // (16 ** 2))
+    octet3 = get_s_box_value((cuvant % 16 ** 6) // (16 ** 4))
     octet4 = get_s_box_value(cuvant // (16 ** 6))
 
-    cuvant = octet3 * (16 ** 6) + octet2 * (16 ** 4) + octet1 * (16 ** 2) + octet4
+    return octet4 * (16 ** 6) + octet3 * (16 ** 4) + octet2 * (16 ** 2) + octet1
+
+def g(cuvant, runda):
+
+    cuvant = __substituire_cuvant(cuvant)
+    cuvant = __st_rot(cuvant, 8)
 
     return cuvant ^ constanta_runda[runda]
 
@@ -149,18 +155,52 @@ def __inv_mixeaza_coloane(stare_mesaj):
     return rezultat
 
 # 1 cuvant == 4 octeti
-def __expansioneaza_cheia(cuvinte_cheie):
-    for runda in range(1, 11):
-        i = runda * 4
-        cuvant0 = cuvinte_cheie[i - 4] ^ g(cuvinte_cheie[i - 1], runda)
-        cuvant1 = cuvant0 ^ cuvinte_cheie[i - 3]
-        cuvant2 = cuvant1 ^ cuvinte_cheie[i - 2]
-        cuvant3 = cuvant2 ^ cuvinte_cheie[i - 1]
+def __expansioneaza_cheia(cheie):
 
-        cuvinte_cheie.append(cuvant0)
-        cuvinte_cheie.append(cuvant1)
-        cuvinte_cheie.append(cuvant2)
-        cuvinte_cheie.append(cuvant3)
+    cuvinte_cheie = [] # lista ce memoreaza cheia + cheile de runde generate ulterior
+
+    lung_cheie = len(cheie)
+    marime_cheie = lung_cheie/8
+
+    for i in range(0, lung_cheie, 8):
+        cuvant = int(cheie[i:i + 8:], 16)
+        cuvinte_cheie.append(cuvant)
+
+    if marime_cheie == 4: # aes-128
+        for runda in range(1, 11):
+            i = runda * 4
+            cuvant0 = cuvinte_cheie[i - 4] ^ g(cuvinte_cheie[i - 1], runda)
+            cuvant1 = cuvant0 ^ cuvinte_cheie[i - 3]
+            cuvant2 = cuvant1 ^ cuvinte_cheie[i - 2]
+            cuvant3 = cuvant2 ^ cuvinte_cheie[i - 1]
+
+            cuvinte_cheie.append(cuvant0)
+            cuvinte_cheie.append(cuvant1)
+            cuvinte_cheie.append(cuvant2)
+            cuvinte_cheie.append(cuvant3)
+
+    elif marime_cheie == 8: # aes-256
+        for runda in range(1, 9):
+            i = runda * 8
+            cuvant0 = cuvinte_cheie[i - 8] ^ g(cuvinte_cheie[i - 1], runda)
+            cuvant1 = cuvant0 ^ cuvinte_cheie[i - 7]
+            cuvant2 = cuvant1 ^ cuvinte_cheie[i - 6]
+            cuvant3 = cuvant2 ^ cuvinte_cheie[i - 5]
+            cuvant4 = __substituire_cuvant(cuvant3) ^ cuvinte_cheie[i - 4]
+            cuvant5 = cuvant4 ^ cuvinte_cheie[i - 3]
+            cuvant6 = cuvant5 ^ cuvinte_cheie[i - 2]
+            cuvant7 = cuvant6 ^ cuvinte_cheie[i - 1]
+
+            cuvinte_cheie.append(cuvant0)
+            cuvinte_cheie.append(cuvant1)
+            cuvinte_cheie.append(cuvant2)
+            cuvinte_cheie.append(cuvant3)
+            cuvinte_cheie.append(cuvant4)
+            cuvinte_cheie.append(cuvant5)
+            cuvinte_cheie.append(cuvant6)
+            cuvinte_cheie.append(cuvant7)
+
+    return cuvinte_cheie
 
 # padding (pkcs#7)
 def __adauga_padding(octeti_mesaj):
@@ -172,23 +212,12 @@ def __adauga_padding(octeti_mesaj):
         for i in range(0, pad):
             octeti_mesaj.append(pad)
 
-def __sterge_padding(mesaj):
-
-    lung_mesaj = mesaj
-    lung_padding = mesaj[-1]
-    for i in range(lung_mesaj):
-        ...
-
 # aes-128, modul EBC cu padding pkcs#7
 def aes_128(mesaj, cheie, operatie):
 
-    cuvinte_cheie = []
     # initial, impartim cheia in 4 cuvinte, fiecare cuvant avand 32 biti (4 octeti, 8 valori hexa)
     # apoi o expansionam
-    for i in range(0, 32, 8):
-        cuvant = int(cheie[i:i + 8:], 16)
-        cuvinte_cheie.append(cuvant)
-    __expansioneaza_cheia(cuvinte_cheie)
+    cuvinte_cheie = __expansioneaza_cheia(cheie)
 
     # criptarea propriu-zisa
     if operatie == 'criptare':
@@ -212,7 +241,8 @@ def aes_128(mesaj, cheie, operatie):
 
             __adauga_cheie(stare_mesaj, cuvinte_cheie, 0)
 
-            for runda in range(1, 10):
+            runde = 10 if len(cheie) == 32 else 14
+            for runda in range(1, runde):
 
                 __substituire(stare_mesaj)
                 __schimba_linii(stare_mesaj)
@@ -221,7 +251,7 @@ def aes_128(mesaj, cheie, operatie):
 
             __substituire(stare_mesaj)
             __schimba_linii(stare_mesaj)
-            __adauga_cheie(stare_mesaj, cuvinte_cheie, 10)
+            __adauga_cheie(stare_mesaj, cuvinte_cheie, runde)
 
             for j in range(0, 4):
                 for i in range(0, 4):
@@ -254,9 +284,10 @@ def aes_128(mesaj, cheie, operatie):
                     stare_mesaj[i][j] = bloc_mesaj[index_octeti]
                     index_octeti += 1
 
-            __adauga_cheie(stare_mesaj, cuvinte_cheie, 10)
+            runde = 9 if len(cheie) == 32 else 13
+            __adauga_cheie(stare_mesaj, cuvinte_cheie, runde + 1)
 
-            for runda in range(9, 0, -1):
+            for runda in range(runde, 0, -1):
 
                 __inv_schimba_linii(stare_mesaj)
                 __inv_substituire(stare_mesaj)
@@ -283,7 +314,7 @@ def aes_128(mesaj, cheie, operatie):
 
 if __name__ == '__main__':
 
-    a = aes_128('64bb939bc5282990321f47e44a2a4b2b a2c2ecec95966f1b7c11299c78234a79 e0d7db79833623b59cb7e8c40687313d 824b05102459890afabd3b6886843bc1', '54 68 61 74 73 20 6D 79 20 4B 75 6E 67 20 46 75'.lower().replace(' ', ''), 'decriptare')
+    a = aes_128('eca4a74ae9a7ab4b8785ecbfea01e4e2 d7ece1b0f9a13ff6eeb7ffb0866c7919 e93c747ce2c953af60f5d96a085fa6ec 6f9284d31756e8cff45a3f08da8d5db8', '5468617473206D79204B756E672046755468617473206D79204B756E67204675'.lower().replace(' ', ''), 'decriptare')
     print(a)
     '''a = np.array([[0x63, 0xEB, 0x9F, 0xA0],
                   [0x2F, 0x93, 0x92, 0xC0],
@@ -293,3 +324,4 @@ if __name__ == '__main__':
 #Two one nine two
 #29c3505f571420f6402299b31a02d73a
 #29C3505F571420F6402299B31A02D73A
+#5468617473206D79204B756E67204675
