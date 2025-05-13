@@ -171,6 +171,414 @@ def reset_polybius_bifid_entry(entry_vals, size_combobox):
             if i < len(alphabet):
                 entry.insert(0, alphabet[i])
 
+def number_to_letter(number):
+
+    if 1 <= number <= 26:
+        return chr(64 + number)
+    else:
+        return ""
+
+def enigma_entry_set(entry, value):
+
+    entry.config(state="normal")
+    entry.delete(0, tk.END)
+    entry.insert(0, f"{value} {number_to_letter(value)}")
+    entry.config(state="readonly")
+
+def increment(entry):
+
+    entry.config(state="normal")
+    value = entry.get().split()
+    number = int(value[0])
+    if number < 26:
+        number += 1
+    else:
+        number = 1
+    enigma_entry_set(entry, number)
+
+def decrement(entry):
+
+    entry.config(state="normal")
+    value = entry.get().split()
+    number = int(value[0])
+    if number > 1:
+        number -= 1
+    else:
+        number = 26
+    enigma_entry_set(entry, number)
+
+def generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals):
+
+    selected_version = entry_vals["enigma_version_combobox"].get()
+
+    for widget in settings_frame.winfo_children():
+        if widget != enigma_version_combobox.master:
+            widget.destroy()
+
+    if selected_version == "Enigma I":
+
+        reflector_label = tk.Label(settings_frame, text="Reflector: ")
+        reflector_label.grid(row=1, column=4, pady=5)
+        reflector_combobox = ttk.Combobox(settings_frame, values=["UKW A", "UKW B", "UKW C"], width=6, state="readonly")
+        reflector_combobox.set("UKW A")
+        reflector_combobox.grid(row=1, column=5, pady=5)
+
+        enigma_settings_frame = tk.Frame(settings_frame)
+        enigma_settings_frame.grid(row=2, column=0, columnspan=10)
+
+        rotor1_label = tk.Label(enigma_settings_frame, text = "Rotor 1")
+        rotor1_label.grid(row = 0, column = 0)
+        rotor1_combobox = ttk.Combobox(enigma_settings_frame, values = ["I", "II", "III", "IV", "V"], width = 5, state = "readonly", justify = "center")
+        rotor1_combobox.set("I")
+        rotor1_combobox.grid(row = 1, column = 0)
+        rotor2_label = tk.Label(enigma_settings_frame, text = "Rotor 2")
+        rotor2_label.grid(row=2, column=0)
+        rotor2_combobox = ttk.Combobox(enigma_settings_frame, values = ["I", "II", "III", "IV", "V"], width = 5, state = "readonly", justify = "center")
+        rotor2_combobox.set("I")
+        rotor2_combobox.grid(row = 3, column = 0)
+        rotor3_label = tk.Label(enigma_settings_frame, text = "Rotor 3")
+        rotor3_label.grid(row=4, column=0)
+        rotor3_combobox = ttk.Combobox(enigma_settings_frame, values = ["I", "II", "III", "IV", "V"], width = 5, state = "readonly", justify = "center")
+        rotor3_combobox.set("I")
+        rotor3_combobox.grid(row = 5, column = 0)
+
+        enigma_settings_frame.columnconfigure(1, minsize=30)
+        enigma_settings_frame.columnconfigure(5, minsize=30)
+
+        position1_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position1_label.grid(row=0, column=3)
+        minus_button_position1 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position1.grid(row=1, column=2)
+        minus_button_position1.config(command=lambda: decrement(position1_entry))
+        position1_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position1_entry.grid(row=1, column=3)
+        plus_button_position1 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position1.grid(row=1, column=4)
+        plus_button_position1.config(command=lambda: increment(position1_entry))
+
+        ring1_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring1_label.grid(row=0, column=7, padx=10)
+        minus_button_ring1 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring1.grid(row=1, column=6)
+        minus_button_ring1.config(command=lambda: decrement(ring1_entry))
+        ring1_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring1_entry.grid(row=1, column=7)
+        plus_button_ring1 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring1.grid(row=1, column=8)
+        plus_button_ring1.config(command=lambda: increment(ring1_entry))
+
+        enigma_entry_set(position1_entry, 1)
+        enigma_entry_set(ring1_entry, 1)
+
+        position2_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position2_label.grid(row=2, column=3)
+        minus_button_position2 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position2.grid(row=3, column=2)
+        minus_button_position2.config(command=lambda: decrement(position2_entry))
+        position2_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position2_entry.grid(row=3, column=3)
+        plus_button_position2 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position2.grid(row=3, column=4)
+        plus_button_position2.config(command=lambda: increment(position2_entry))
+
+        ring2_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring2_label.grid(row=2, column=7, padx=10)
+        minus_button_ring2 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring2.grid(row=3, column=6)
+        minus_button_ring2.config(command=lambda: decrement(ring2_entry))
+        ring2_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring2_entry.grid(row=3, column=7)
+        plus_button_ring2 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring2.grid(row=3, column=8)
+        plus_button_ring2.config(command=lambda: increment(ring2_entry))
+
+        enigma_entry_set(position2_entry, 1)
+        enigma_entry_set(ring2_entry, 1)
+
+        position3_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position3_label.grid(row=4, column=3)
+        minus_button_position3 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position3.grid(row=5, column=2)
+        minus_button_position3.config(command=lambda: decrement(position3_entry))
+        position3_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position3_entry.grid(row=5, column=3)
+        plus_button_position3 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position3.grid(row=5, column=4)
+        plus_button_position3.config(command=lambda: increment(position3_entry))
+
+        ring3_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring3_label.grid(row=4, column=7, padx=10)
+        minus_button_ring3 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring3.grid(row=5, column=6)
+        minus_button_ring3.config(command=lambda: decrement(ring3_entry))
+        ring3_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring3_entry.grid(row=5, column=7)
+        plus_button_ring3 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring3.grid(row=5, column=8)
+        plus_button_ring3.config(command=lambda: increment(ring3_entry))
+
+        enigma_entry_set(position3_entry, 1)
+        enigma_entry_set(ring3_entry, 1)
+
+        plugboard_label = tk.Label(enigma_settings_frame, text="Tablou comutator")
+        plugboard_label.grid(row = 6, column = 0, columnspan = 10)
+        plugboard_entry = tk.Entry(enigma_settings_frame, width=30, justify="center")
+        plugboard_entry.insert(0, "bq cr di ej kw mt os px uz gh")
+        plugboard_entry.grid(row = 7, column = 0, columnspan = 10, pady=(0,10))
+
+    elif selected_version == "Enigma M3":
+
+        reflector_label = tk.Label(settings_frame, text="Reflector: ")
+        reflector_label.grid(row=1, column=4, pady=5)
+        reflector_combobox = ttk.Combobox(settings_frame, values=["UKW B", "UKW C"], width=6, state="readonly")
+        reflector_combobox.set("UKW B")
+        reflector_combobox.grid(row=1, column=5, pady=5)
+
+        enigma_settings_frame = tk.Frame(settings_frame)
+        enigma_settings_frame.grid(row=2, column=0, columnspan=10)
+
+        rotor1_label = tk.Label(enigma_settings_frame, text="Rotor 1")
+        rotor1_label.grid(row=0, column=0)
+        rotor1_combobox = ttk.Combobox(enigma_settings_frame, values=["I", "II", "III", "IV", "V", "VI", "VII", "VIII"], width=5, state="readonly", justify="center")
+        rotor1_combobox.set("I")
+        rotor1_combobox.grid(row=1, column=0)
+        rotor2_label = tk.Label(enigma_settings_frame, text="Rotor 2")
+        rotor2_label.grid(row=2, column=0)
+        rotor2_combobox = ttk.Combobox(enigma_settings_frame, values=["I", "II", "III", "IV", "V", "VI", "VII", "VIII"], width=5, state="readonly", justify="center")
+        rotor2_combobox.set("I")
+        rotor2_combobox.grid(row=3, column=0)
+        rotor3_label = tk.Label(enigma_settings_frame, text="Rotor 3")
+        rotor3_label.grid(row=4, column=0)
+        rotor3_combobox = ttk.Combobox(enigma_settings_frame, values=["I", "II", "III", "IV", "V", "VI", "VII", "VIII"], width=5, state="readonly", justify="center")
+        rotor3_combobox.set("I")
+        rotor3_combobox.grid(row=5, column=0)
+
+        enigma_settings_frame.columnconfigure(1, minsize=30)
+        enigma_settings_frame.columnconfigure(5, minsize=30)
+
+        position1_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position1_label.grid(row=0, column=3)
+        minus_button_position1 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position1.grid(row=1, column=2)
+        minus_button_position1.config(command=lambda: decrement(position1_entry))
+        position1_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position1_entry.grid(row=1, column=3)
+        plus_button_position1 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position1.grid(row=1, column=4)
+        plus_button_position1.config(command=lambda: increment(position1_entry))
+
+        ring1_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring1_label.grid(row=0, column=7, padx=10)
+        minus_button_ring1 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring1.grid(row=1, column=6)
+        minus_button_ring1.config(command=lambda: decrement(ring1_entry))
+        ring1_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring1_entry.grid(row=1, column=7)
+        plus_button_ring1 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring1.grid(row=1, column=8)
+        plus_button_ring1.config(command=lambda: increment(ring1_entry))
+
+        enigma_entry_set(position1_entry, 1)
+        enigma_entry_set(ring1_entry, 1)
+
+        position2_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position2_label.grid(row=2, column=3)
+        minus_button_position2 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position2.grid(row=3, column=2)
+        minus_button_position2.config(command=lambda: decrement(position2_entry))
+        position2_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position2_entry.grid(row=3, column=3)
+        plus_button_position2 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position2.grid(row=3, column=4)
+        plus_button_position2.config(command=lambda: increment(position2_entry))
+
+        ring2_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring2_label.grid(row=2, column=7, padx=10)
+        minus_button_ring2 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring2.grid(row=3, column=6)
+        minus_button_ring2.config(command=lambda: decrement(ring2_entry))
+        ring2_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring2_entry.grid(row=3, column=7)
+        plus_button_ring2 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring2.grid(row=3, column=8)
+        plus_button_ring2.config(command=lambda: increment(ring2_entry))
+
+        enigma_entry_set(position2_entry, 1)
+        enigma_entry_set(ring2_entry, 1)
+
+        position3_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position3_label.grid(row=4, column=3)
+        minus_button_position3 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position3.grid(row=5, column=2)
+        minus_button_position3.config(command=lambda: decrement(position3_entry))
+        position3_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position3_entry.grid(row=5, column=3)
+        plus_button_position3 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position3.grid(row=5, column=4)
+        plus_button_position3.config(command=lambda: increment(position3_entry))
+
+        ring3_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring3_label.grid(row=4, column=7, padx=10)
+        minus_button_ring3 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring3.grid(row=5, column=6)
+        minus_button_ring3.config(command=lambda: decrement(ring3_entry))
+        ring3_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring3_entry.grid(row=5, column=7)
+        plus_button_ring3 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring3.grid(row=5, column=8)
+        plus_button_ring3.config(command=lambda: increment(ring3_entry))
+
+        enigma_entry_set(position3_entry, 1)
+        enigma_entry_set(ring3_entry, 1)
+
+        plugboard_label = tk.Label(enigma_settings_frame, text="Tablou comutator")
+        plugboard_label.grid(row=6, column=0, columnspan=10)
+        plugboard_entry = tk.Entry(enigma_settings_frame, width=30, justify="center")
+        plugboard_entry.insert(0, "bq cr di ej kw mt os px uz gh")
+        plugboard_entry.grid(row=7, column=0, columnspan=10, pady=(0, 10))
+
+    if selected_version == 'Enigma M4 "Shark"':
+
+        reflector_label = tk.Label(settings_frame, text="Reflector: ")
+        reflector_label.grid(row=1, column=4, pady=5)
+        reflector_combobox = ttk.Combobox(settings_frame, values=["UKW B thin", "UKW C thin"], width=10, state="readonly")
+        reflector_combobox.set("UKW B thin")
+        reflector_combobox.grid(row=1, column=5, pady=5)
+
+        enigma_settings_frame = tk.Frame(settings_frame)
+        enigma_settings_frame.grid(row=2, column=0, columnspan=10)
+
+        rotor1_label = tk.Label(enigma_settings_frame, text="Rotor 1")
+        rotor1_label.grid(row=0, column=0)
+        rotor1_combobox = ttk.Combobox(enigma_settings_frame, values=["Beta", "Gamma"], width=7, state="readonly", justify="center")
+        rotor1_combobox.set("Beta")
+        rotor1_combobox.grid(row=1, column=0)
+        rotor2_label = tk.Label(enigma_settings_frame, text="Rotor 2")
+        rotor2_label.grid(row=2, column=0)
+        rotor2_combobox = ttk.Combobox(enigma_settings_frame, values=["I", "II", "III", "IV", "V", "VI", "VII", "VIII"], width=5, state="readonly", justify="center")
+        rotor2_combobox.set("I")
+        rotor2_combobox.grid(row=3, column=0)
+        rotor3_label = tk.Label(enigma_settings_frame, text="Rotor 3")
+        rotor3_label.grid(row=4, column=0)
+        rotor3_combobox = ttk.Combobox(enigma_settings_frame, values=["I", "II", "III", "IV", "V", "VI", "VII", "VIII"], width=5, state="readonly", justify="center")
+        rotor3_combobox.set("I")
+        rotor3_combobox.grid(row=5, column=0)
+        rotor4_label = tk.Label(enigma_settings_frame, text="Rotor 4")
+        rotor4_label.grid(row=6, column=0)
+        rotor4_combobox = ttk.Combobox(enigma_settings_frame, values=["I", "II", "III", "IV", "V", "VI", "VII", "VIII"], width=5, state="readonly", justify="center")
+        rotor4_combobox.set("I")
+        rotor4_combobox.grid(row=7, column=0)
+
+        enigma_settings_frame.columnconfigure(1, minsize=30)
+        enigma_settings_frame.columnconfigure(5, minsize=30)
+
+        position1_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position1_label.grid(row=0, column=3)
+        minus_button_position1 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position1.grid(row=1, column=2)
+        minus_button_position1.config(command=lambda: decrement(position1_entry))
+        position1_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position1_entry.grid(row=1, column=3)
+        plus_button_position1 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position1.grid(row=1, column=4)
+        plus_button_position1.config(command=lambda: increment(position1_entry))
+
+        ring1_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring1_label.grid(row=0, column=7, padx=10)
+        minus_button_ring1 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring1.grid(row=1, column=6)
+        minus_button_ring1.config(command=lambda: decrement(ring1_entry))
+        ring1_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring1_entry.grid(row=1, column=7)
+        plus_button_ring1 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring1.grid(row=1, column=8)
+        plus_button_ring1.config(command=lambda: increment(ring1_entry))
+
+        enigma_entry_set(position1_entry, 1)
+        enigma_entry_set(ring1_entry, 1)
+
+        position2_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position2_label.grid(row=2, column=3)
+        minus_button_position2 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position2.grid(row=3, column=2)
+        minus_button_position2.config(command=lambda: decrement(position2_entry))
+        position2_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position2_entry.grid(row=3, column=3)
+        plus_button_position2 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position2.grid(row=3, column=4)
+        plus_button_position2.config(command=lambda: increment(position2_entry))
+
+        ring2_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring2_label.grid(row=2, column=7, padx=10)
+        minus_button_ring2 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring2.grid(row=3, column=6)
+        minus_button_ring2.config(command=lambda: decrement(ring2_entry))
+        ring2_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring2_entry.grid(row=3, column=7)
+        plus_button_ring2 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring2.grid(row=3, column=8)
+        plus_button_ring2.config(command=lambda: increment(ring2_entry))
+
+        enigma_entry_set(position2_entry, 1)
+        enigma_entry_set(ring2_entry, 1)
+
+        position3_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position3_label.grid(row=4, column=3)
+        minus_button_position3 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position3.grid(row=5, column=2)
+        minus_button_position3.config(command=lambda: decrement(position3_entry))
+        position3_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position3_entry.grid(row=5, column=3)
+        plus_button_position3 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position3.grid(row=5, column=4)
+        plus_button_position3.config(command=lambda: increment(position3_entry))
+
+        ring3_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring3_label.grid(row=4, column=7, padx=10)
+        minus_button_ring3 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring3.grid(row=5, column=6)
+        minus_button_ring3.config(command=lambda: decrement(ring3_entry))
+        ring3_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring3_entry.grid(row=5, column=7)
+        plus_button_ring3 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring3.grid(row=5, column=8)
+        plus_button_ring3.config(command=lambda: increment(ring3_entry))
+
+        enigma_entry_set(position3_entry, 1)
+        enigma_entry_set(ring3_entry, 1)
+
+        position4_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position4_label.grid(row=6, column=3)
+        minus_button_position4 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position4.grid(row=7, column=2)
+        minus_button_position4.config(command=lambda: decrement(position4_entry))
+        position4_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position4_entry.grid(row=7, column=3)
+        plus_button_position4 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position4.grid(row=7, column=4)
+        plus_button_position4.config(command=lambda: increment(position4_entry))
+
+        ring4_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring4_label.grid(row=6, column=7, padx=10)
+        minus_button_ring4 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring4.grid(row=7, column=6)
+        minus_button_ring4.config(command=lambda: decrement(ring4_entry))
+        ring4_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring4_entry.grid(row=7, column=7)
+        plus_button_ring4 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring4.grid(row=7, column=8)
+        plus_button_ring4.config(command=lambda: increment(ring4_entry))
+
+        enigma_entry_set(position4_entry, 1)
+        enigma_entry_set(ring4_entry, 1)
+
+        plugboard_label = tk.Label(enigma_settings_frame, text="Tablou comutator")
+        plugboard_label.grid(row=8, column=0, columnspan=10)
+        plugboard_entry = tk.Entry(enigma_settings_frame, width=30, justify="center")
+        plugboard_entry.insert(0, "bq cr di ej kw mt os px uz gh")
+        plugboard_entry.grid(row=9, column=0, columnspan=10, pady=(0, 10))
+
+
 def update_settings(combobox, settings_frame, entry_vals):
 
     for widget in settings_frame.winfo_children():
@@ -289,6 +697,19 @@ def update_settings(combobox, settings_frame, entry_vals):
         entry_vals["size_combobox"] = size_combobox
 
         generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entry_vals)
+
+    elif selected_algorithm == "Enigma":
+
+        enigma_settings_frame = tk.Frame(settings_frame)
+        enigma_settings_frame.grid(row=0, column=0, columnspan=10)
+
+        enigma_version_combobox = ttk.Combobox(enigma_settings_frame, values = ["Enigma I", "Enigma M3", 'Enigma M4 "Shark"'], width = 16, state="readonly")
+        enigma_version_combobox.set("Enigma I")
+        enigma_version_combobox.grid(row = 0, column = 0, columnspan = 10)
+        entry_vals["enigma_version_combobox"] = enigma_version_combobox
+        enigma_version_combobox.bind("<<ComboboxSelected>>",lambda event: generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals))
+
+        generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals)
 
 def verify_text(text):
 
@@ -508,13 +929,13 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         if choice == "SHA-512":
 
             textbox2.delete("1.0", "end-1c")
-            textbox2.insert("end-1c", "SHA-512")    #aici inlocuiesti
+            textbox2.insert("end-1c", "SHA-512")
             textbox2.config(state = DISABLED)
 
         if choice == "MD5":
 
             textbox2.delete("1.0", "end-1c")
-            textbox2.insert("end-1c", "MD5")    #aici inlocuiesti
+            textbox2.insert("end-1c", "MD5")
             textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "AES":
@@ -655,7 +1076,7 @@ def main():
     settings_frame = tk.Frame(root)
     settings_frame.grid(row = 1, column = 1, sticky = "n")
 
-    combobox = ttk.Combobox(options_frame, values = ["Caesar Cipher","Vigenère Cipher", "Polybius", "Bifid Cipher", "ADFGVX", "Hashing", "AES", "RC4", "Playfair Cipher", "Hill Cipher"], state = "readonly")
+    combobox = ttk.Combobox(options_frame, values = ["Caesar Cipher","Vigenère Cipher", "Polybius", "Bifid Cipher", "ADFGVX", "Hashing", "AES", "RC4", "Playfair Cipher", "Hill Cipher", "Enigma"], state = "readonly")
     combobox.set("Alege algoritmul")
     combobox.grid(row = 0, column = 0, columnspan = 2)
     combobox.bind("<<ComboboxSelected>>", lambda event: update_settings(combobox, settings_frame, entry_vals))
