@@ -1,5 +1,6 @@
+import numpy as np
 
-class Reflector:
+class _Reflector:
 
     def __init__(self, config):
 
@@ -14,7 +15,7 @@ class Reflector:
     def schimb(self, litera):
         return self._config[litera]
 
-class Rotor:
+class _Rotor:
 
     def __init__(self, config, offset, inel, creste):
 
@@ -58,16 +59,16 @@ class Rotor:
     def rotire(self):
         self._offset = (self._offset + 1) % 26
 
-rotor_config = ['EKMFLGDQVZNTOWYHXUSPAIBRCJ/Y'.lower(),
+_rotor_config = np.array(['EKMFLGDQVZNTOWYHXUSPAIBRCJ/Y'.lower(),
                     'AJDKSIRUXBLHWTMCQGZNPYFVOE/M'.lower(),
                     'BDFHJLCPRTXVZNYEIWGAKMUSQO/D'.lower(),
                     'ESOVPZJAYQUIRHXLNFTGKDCMWB/R'.lower(),
                     'VZBRGITYUPSDNHLXAWMJQOFECK/H'.lower(),
                     'JPGVOUMFYQBENHZRDKASXLICTW/HU'.lower(),
                     'NZJHGRCXMYSWBOUFAIVLPEKQDT/HU'.lower(),
-                    'FKQHTLXOCBJSPDZRAMEWNIUYGV/HU'.lower()]
+                    'FKQHTLXOCBJSPDZRAMEWNIUYGV/HU'.lower()], dtype = object)
 
-reflector_config = {'a':'EJMZALYXVBWFCRQUONTSPIKHGD'.lower(),
+_reflector_config = {'a': 'EJMZALYXVBWFCRQUONTSPIKHGD'.lower(),
                         'b':'YRUHQSLDPXNGOKMIEBFZCWVJAT'.lower(),
                         'c':'FVPJIAOYEDRZXWGCTKUQSBNMHL'.lower()}
 
@@ -87,13 +88,13 @@ def enigma1(mesaj, reflector, rotor1, rotor2, rotor3, tablou):
         except:
             interschimbare[litera] = litera
 
-    reflector = Reflector(reflector_config[reflector])
-    rot1 = Rotor(rotor_config[rotor1['rotor'] - 1], rotor1['offset'], rotor1['inel'],
-                 rotor_config[rotor1['rotor'] - 1][27:])
-    rot2 = Rotor(rotor_config[rotor2['rotor'] - 1], rotor2['offset'], rotor2['inel'],
-                 rotor_config[rotor2['rotor'] - 1][27:])
-    rot3 = Rotor(rotor_config[rotor3['rotor'] - 1], rotor3['offset'], rotor3['inel'],
-                 rotor_config[rotor3['rotor'] - 1][27:])
+    reflector = _Reflector(_reflector_config[reflector])
+    rot1 = _Rotor(_rotor_config[rotor1['rotor'] - 1], rotor1['offset'], rotor1['inel'],
+                  _rotor_config[rotor1['rotor'] - 1][27:])
+    rot2 = _Rotor(_rotor_config[rotor2['rotor'] - 1], rotor2['offset'], rotor2['inel'],
+                  _rotor_config[rotor2['rotor'] - 1][27:])
+    rot3 = _Rotor(_rotor_config[rotor3['rotor'] - 1], rotor3['offset'], rotor3['inel'],
+                  _rotor_config[rotor3['rotor'] - 1][27:])
 
     mesaj_substituit = ''
     for litera in mesaj:
@@ -149,10 +150,10 @@ def enigma3(mesaj, reflector, rotor1, rotor2, rotor3, tablou):
         except:
             interschimbare[litera] = litera
 
-    reflector = Reflector(reflector_config[reflector])
-    rot1 = Rotor(rotor_config[rotor1['rotor']-1], rotor1['offset'], rotor1['inel'], rotor_config[rotor1['rotor']-1][27:])
-    rot2 = Rotor(rotor_config[rotor2['rotor']-1], rotor2['offset'], rotor2['inel'], rotor_config[rotor2['rotor']-1][27:])
-    rot3 = Rotor(rotor_config[rotor3['rotor']-1], rotor3['offset'], rotor3['inel'], rotor_config[rotor3['rotor']-1][27:])
+    reflector = _Reflector(_reflector_config[reflector])
+    rot1 = _Rotor(_rotor_config[rotor1['rotor'] - 1], rotor1['offset'], rotor1['inel'], _rotor_config[rotor1['rotor'] - 1][27:])
+    rot2 = _Rotor(_rotor_config[rotor2['rotor'] - 1], rotor2['offset'], rotor2['inel'], _rotor_config[rotor2['rotor'] - 1][27:])
+    rot3 = _Rotor(_rotor_config[rotor3['rotor'] - 1], rotor3['offset'], rotor3['inel'], _rotor_config[rotor3['rotor'] - 1][27:])
 
     mesaj_substituit = ''
     for litera in mesaj:
@@ -211,11 +212,11 @@ def enigma4(mesaj, reflector, spec_rotor, rotor1, rotor2, rotor3, tablou):
         except:
             interschimbare[litera] = litera
 
-    reflector = Reflector(reflector_config[reflector])
-    spec_rotor = Rotor(spec_rotor_config[spec_rotor['rotor']], spec_rotor['offset'], spec_rotor['inel'], 'a')
-    rot1 = Rotor(rotor_config[rotor1['rotor']-1], rotor1['offset'], rotor1['inel'], rotor_config[rotor1['rotor']-1][27:])
-    rot2 = Rotor(rotor_config[rotor2['rotor']-1], rotor2['offset'], rotor2['inel'], rotor_config[rotor2['rotor']-1][27:])
-    rot3 = Rotor(rotor_config[rotor3['rotor']-1], rotor3['offset'], rotor3['inel'], rotor_config[rotor3['rotor']-1][27:])
+    reflector = _Reflector(_reflector_config[reflector])
+    spec_rotor = _Rotor(spec_rotor_config[spec_rotor['rotor']], spec_rotor['offset'], spec_rotor['inel'], 'a')
+    rot1 = _Rotor(_rotor_config[rotor1['rotor'] - 1], rotor1['offset'], rotor1['inel'], _rotor_config[rotor1['rotor'] - 1][27:])
+    rot2 = _Rotor(_rotor_config[rotor2['rotor'] - 1], rotor2['offset'], rotor2['inel'], _rotor_config[rotor2['rotor'] - 1][27:])
+    rot3 = _Rotor(_rotor_config[rotor3['rotor'] - 1], rotor3['offset'], rotor3['inel'], _rotor_config[rotor3['rotor'] - 1][27:])
 
     mesaj_substituit = ''
     for litera in mesaj:
