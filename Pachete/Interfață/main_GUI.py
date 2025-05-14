@@ -34,6 +34,10 @@ def generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entr
 
     size = 5
     combobox_value = size_combobox.get()
+    if combobox_value == "2x2":
+        size = 2
+    if combobox_value == "3x3":
+        size = 3
     if combobox_value == "5x5":
         size = 5
     if combobox_value == "6x6":
@@ -45,7 +49,34 @@ def generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entr
         if not isinstance(widget, tk.Frame):
             widget.destroy()
 
-    if combobox.get() == "ADFGVX":
+    if combobox.get() == "Hill Cipher":
+
+        for row in range(size):
+            if row == size - 1:
+                padding_value = (0, 20)
+            else:
+                padding_value = 0
+            row_labels = tk.Label(settings_frame, text = str(row))
+            row_labels.grid(row = row + 2, column = 0, pady = padding_value)
+        for col in range(size):
+            col_labels = tk.Label(settings_frame, text = str(col))
+            col_labels.grid(row = 1, column = col + 2, padx = 5)
+
+        playfair_entry = []
+        for row in range(size):
+            if row == size - 1:
+                padding_value = (0, 20)
+            else:
+                padding_value = 0
+            for col in range(size):
+                entry = tk.Entry(settings_frame, width = 2, justify = "center")
+                entry.grid(row = row + 2, column = col + 2, pady = padding_value)
+                entry.bind("<KeyRelease>", limit_one_char)
+                entry.bind("<FocusOut>", limit_one_char)
+                playfair_entry.append(entry)
+        entry_vals["matrix_entry"] = playfair_entry
+
+    elif combobox.get() == "ADFGVX":
 
         index_list = ["A" , "D", "F", "G", "V", "X", "Z"]
         index = 0
@@ -63,7 +94,7 @@ def generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entr
             index += 1
             col_labels.grid(row = 2, column = col + 3, padx = 5)
 
-        polybius_entry = []
+        adfgvx_entry = []
         for row in range(size):
             if row == size - 1:
                 padding_value = (0, 20)
@@ -74,8 +105,8 @@ def generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entr
                 entry.grid(row=row + 3, column=col + 3, pady=padding_value)
                 entry.bind("<KeyRelease>", limit_one_char)
                 entry.bind("<FocusOut>", limit_one_char)
-                polybius_entry.append(entry)
-        entry_vals["polybius_entry"] = polybius_entry
+                adfgvx_entry.append(entry)
+        entry_vals["matrix_entry"] = adfgvx_entry
         reset_polybius_bifid_entry(entry_vals, size_combobox)
 
     else:
@@ -103,7 +134,7 @@ def generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entr
                 entry.bind("<KeyRelease>", limit_one_char)
                 entry.bind("<FocusOut>", limit_one_char)
                 polybius_entry.append(entry)
-        entry_vals["polybius_entry"] = polybius_entry
+        entry_vals["matrix_entry"] = polybius_entry
         reset_polybius_bifid_entry(entry_vals, size_combobox)
 
 def reset_polybius_bifid_entry(entry_vals, size_combobox):
@@ -120,7 +151,7 @@ def reset_polybius_bifid_entry(entry_vals, size_combobox):
             alphabet.append(chr(c))
 
     if combobox_value == "5x5":
-        for i, entry in enumerate(entry_vals["polybius_entry"]):
+        for i, entry in enumerate(entry_vals["matrix_entry"]):
             entry.delete(0, tk.END)
             if i < len(alphabet):
                 entry.insert(0, alphabet[i])
@@ -129,16 +160,424 @@ def reset_polybius_bifid_entry(entry_vals, size_combobox):
         alphabet = alphabet + [char for char in string.digits] + [char for char in string.punctuation]
 
     if combobox_value == "6x6":
-        for i, entry in enumerate(entry_vals["polybius_entry"]):
+        for i, entry in enumerate(entry_vals["matrix_entry"]):
             entry.delete(0, tk.END)
             if i < len(alphabet):
                 entry.insert(0, alphabet[i])
 
     if combobox_value == "7x7":
-        for i, entry in enumerate(entry_vals["polybius_entry"]):
+        for i, entry in enumerate(entry_vals["matrix_entry"]):
             entry.delete(0, tk.END)
             if i < len(alphabet):
                 entry.insert(0, alphabet[i])
+
+def number_to_letter(number):
+
+    if 1 <= number <= 26:
+        return chr(64 + number)
+    else:
+        return ""
+
+def enigma_entry_set(entry, value):
+
+    entry.config(state="normal")
+    entry.delete(0, tk.END)
+    entry.insert(0, f"{value} {number_to_letter(value)}")
+    entry.config(state="readonly")
+
+def increment(entry):
+
+    entry.config(state="normal")
+    value = entry.get().split()
+    number = int(value[0])
+    if number < 26:
+        number += 1
+    else:
+        number = 1
+    enigma_entry_set(entry, number)
+
+def decrement(entry):
+
+    entry.config(state="normal")
+    value = entry.get().split()
+    number = int(value[0])
+    if number > 1:
+        number -= 1
+    else:
+        number = 26
+    enigma_entry_set(entry, number)
+
+def generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals):
+
+    selected_version = entry_vals["enigma_version_combobox"].get()
+
+    for widget in settings_frame.winfo_children():
+        if widget != enigma_version_combobox.master:
+            widget.destroy()
+
+    if selected_version == "Enigma I":
+
+        reflector_label = tk.Label(settings_frame, text="Reflector: ")
+        reflector_label.grid(row=1, column=4, pady=5)
+        reflector_combobox = ttk.Combobox(settings_frame, values=["UKW A", "UKW B", "UKW C"], width=6, state="readonly")
+        reflector_combobox.set("UKW A")
+        reflector_combobox.grid(row=1, column=5, pady=5)
+
+        enigma_settings_frame = tk.Frame(settings_frame)
+        enigma_settings_frame.grid(row=2, column=0, columnspan=10)
+
+        rotor1_label = tk.Label(enigma_settings_frame, text = "Rotor 1")
+        rotor1_label.grid(row = 0, column = 0)
+        rotor1_combobox = ttk.Combobox(enigma_settings_frame, values = ["I", "II", "III", "IV", "V"], width = 5, state = "readonly", justify = "center")
+        rotor1_combobox.set("I")
+        rotor1_combobox.grid(row = 1, column = 0)
+        rotor2_label = tk.Label(enigma_settings_frame, text = "Rotor 2")
+        rotor2_label.grid(row=2, column=0)
+        rotor2_combobox = ttk.Combobox(enigma_settings_frame, values = ["I", "II", "III", "IV", "V"], width = 5, state = "readonly", justify = "center")
+        rotor2_combobox.set("I")
+        rotor2_combobox.grid(row = 3, column = 0)
+        rotor3_label = tk.Label(enigma_settings_frame, text = "Rotor 3")
+        rotor3_label.grid(row=4, column=0)
+        rotor3_combobox = ttk.Combobox(enigma_settings_frame, values = ["I", "II", "III", "IV", "V"], width = 5, state = "readonly", justify = "center")
+        rotor3_combobox.set("I")
+        rotor3_combobox.grid(row = 5, column = 0)
+
+        enigma_settings_frame.columnconfigure(1, minsize=30)
+        enigma_settings_frame.columnconfigure(5, minsize=30)
+
+        position1_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position1_label.grid(row=0, column=3)
+        minus_button_position1 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position1.grid(row=1, column=2)
+        minus_button_position1.config(command=lambda: decrement(position1_entry))
+        position1_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position1_entry.grid(row=1, column=3)
+        plus_button_position1 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position1.grid(row=1, column=4)
+        plus_button_position1.config(command=lambda: increment(position1_entry))
+
+        ring1_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring1_label.grid(row=0, column=7, padx=10)
+        minus_button_ring1 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring1.grid(row=1, column=6)
+        minus_button_ring1.config(command=lambda: decrement(ring1_entry))
+        ring1_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring1_entry.grid(row=1, column=7)
+        plus_button_ring1 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring1.grid(row=1, column=8)
+        plus_button_ring1.config(command=lambda: increment(ring1_entry))
+
+        enigma_entry_set(position1_entry, 1)
+        enigma_entry_set(ring1_entry, 1)
+
+        position2_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position2_label.grid(row=2, column=3)
+        minus_button_position2 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position2.grid(row=3, column=2)
+        minus_button_position2.config(command=lambda: decrement(position2_entry))
+        position2_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position2_entry.grid(row=3, column=3)
+        plus_button_position2 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position2.grid(row=3, column=4)
+        plus_button_position2.config(command=lambda: increment(position2_entry))
+
+        ring2_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring2_label.grid(row=2, column=7, padx=10)
+        minus_button_ring2 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring2.grid(row=3, column=6)
+        minus_button_ring2.config(command=lambda: decrement(ring2_entry))
+        ring2_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring2_entry.grid(row=3, column=7)
+        plus_button_ring2 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring2.grid(row=3, column=8)
+        plus_button_ring2.config(command=lambda: increment(ring2_entry))
+
+        enigma_entry_set(position2_entry, 1)
+        enigma_entry_set(ring2_entry, 1)
+
+        position3_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position3_label.grid(row=4, column=3)
+        minus_button_position3 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position3.grid(row=5, column=2)
+        minus_button_position3.config(command=lambda: decrement(position3_entry))
+        position3_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position3_entry.grid(row=5, column=3)
+        plus_button_position3 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position3.grid(row=5, column=4)
+        plus_button_position3.config(command=lambda: increment(position3_entry))
+
+        ring3_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring3_label.grid(row=4, column=7, padx=10)
+        minus_button_ring3 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring3.grid(row=5, column=6)
+        minus_button_ring3.config(command=lambda: decrement(ring3_entry))
+        ring3_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring3_entry.grid(row=5, column=7)
+        plus_button_ring3 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring3.grid(row=5, column=8)
+        plus_button_ring3.config(command=lambda: increment(ring3_entry))
+
+        enigma_entry_set(position3_entry, 1)
+        enigma_entry_set(ring3_entry, 1)
+
+        plugboard_label = tk.Label(enigma_settings_frame, text="Tablou comutator")
+        plugboard_label.grid(row = 6, column = 0, columnspan = 10)
+        plugboard_entry = tk.Entry(enigma_settings_frame, width=30, justify="center")
+        plugboard_entry.insert(0, "bq cr di ej kw mt os px uz gh")
+        plugboard_entry.grid(row = 7, column = 0, columnspan = 10, pady=(0,10))
+
+    elif selected_version == "Enigma M3":
+
+        reflector_label = tk.Label(settings_frame, text="Reflector: ")
+        reflector_label.grid(row=1, column=4, pady=5)
+        reflector_combobox = ttk.Combobox(settings_frame, values=["UKW B", "UKW C"], width=6, state="readonly")
+        reflector_combobox.set("UKW B")
+        reflector_combobox.grid(row=1, column=5, pady=5)
+
+        enigma_settings_frame = tk.Frame(settings_frame)
+        enigma_settings_frame.grid(row=2, column=0, columnspan=10)
+
+        rotor1_label = tk.Label(enigma_settings_frame, text="Rotor 1")
+        rotor1_label.grid(row=0, column=0)
+        rotor1_combobox = ttk.Combobox(enigma_settings_frame, values=["I", "II", "III", "IV", "V", "VI", "VII", "VIII"], width=5, state="readonly", justify="center")
+        rotor1_combobox.set("I")
+        rotor1_combobox.grid(row=1, column=0)
+        rotor2_label = tk.Label(enigma_settings_frame, text="Rotor 2")
+        rotor2_label.grid(row=2, column=0)
+        rotor2_combobox = ttk.Combobox(enigma_settings_frame, values=["I", "II", "III", "IV", "V", "VI", "VII", "VIII"], width=5, state="readonly", justify="center")
+        rotor2_combobox.set("I")
+        rotor2_combobox.grid(row=3, column=0)
+        rotor3_label = tk.Label(enigma_settings_frame, text="Rotor 3")
+        rotor3_label.grid(row=4, column=0)
+        rotor3_combobox = ttk.Combobox(enigma_settings_frame, values=["I", "II", "III", "IV", "V", "VI", "VII", "VIII"], width=5, state="readonly", justify="center")
+        rotor3_combobox.set("I")
+        rotor3_combobox.grid(row=5, column=0)
+
+        enigma_settings_frame.columnconfigure(1, minsize=30)
+        enigma_settings_frame.columnconfigure(5, minsize=30)
+
+        position1_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position1_label.grid(row=0, column=3)
+        minus_button_position1 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position1.grid(row=1, column=2)
+        minus_button_position1.config(command=lambda: decrement(position1_entry))
+        position1_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position1_entry.grid(row=1, column=3)
+        plus_button_position1 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position1.grid(row=1, column=4)
+        plus_button_position1.config(command=lambda: increment(position1_entry))
+
+        ring1_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring1_label.grid(row=0, column=7, padx=10)
+        minus_button_ring1 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring1.grid(row=1, column=6)
+        minus_button_ring1.config(command=lambda: decrement(ring1_entry))
+        ring1_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring1_entry.grid(row=1, column=7)
+        plus_button_ring1 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring1.grid(row=1, column=8)
+        plus_button_ring1.config(command=lambda: increment(ring1_entry))
+
+        enigma_entry_set(position1_entry, 1)
+        enigma_entry_set(ring1_entry, 1)
+
+        position2_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position2_label.grid(row=2, column=3)
+        minus_button_position2 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position2.grid(row=3, column=2)
+        minus_button_position2.config(command=lambda: decrement(position2_entry))
+        position2_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position2_entry.grid(row=3, column=3)
+        plus_button_position2 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position2.grid(row=3, column=4)
+        plus_button_position2.config(command=lambda: increment(position2_entry))
+
+        ring2_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring2_label.grid(row=2, column=7, padx=10)
+        minus_button_ring2 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring2.grid(row=3, column=6)
+        minus_button_ring2.config(command=lambda: decrement(ring2_entry))
+        ring2_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring2_entry.grid(row=3, column=7)
+        plus_button_ring2 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring2.grid(row=3, column=8)
+        plus_button_ring2.config(command=lambda: increment(ring2_entry))
+
+        enigma_entry_set(position2_entry, 1)
+        enigma_entry_set(ring2_entry, 1)
+
+        position3_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position3_label.grid(row=4, column=3)
+        minus_button_position3 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position3.grid(row=5, column=2)
+        minus_button_position3.config(command=lambda: decrement(position3_entry))
+        position3_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position3_entry.grid(row=5, column=3)
+        plus_button_position3 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position3.grid(row=5, column=4)
+        plus_button_position3.config(command=lambda: increment(position3_entry))
+
+        ring3_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring3_label.grid(row=4, column=7, padx=10)
+        minus_button_ring3 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring3.grid(row=5, column=6)
+        minus_button_ring3.config(command=lambda: decrement(ring3_entry))
+        ring3_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring3_entry.grid(row=5, column=7)
+        plus_button_ring3 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring3.grid(row=5, column=8)
+        plus_button_ring3.config(command=lambda: increment(ring3_entry))
+
+        enigma_entry_set(position3_entry, 1)
+        enigma_entry_set(ring3_entry, 1)
+
+        plugboard_label = tk.Label(enigma_settings_frame, text="Tablou comutator")
+        plugboard_label.grid(row=6, column=0, columnspan=10)
+        plugboard_entry = tk.Entry(enigma_settings_frame, width=30, justify="center")
+        plugboard_entry.insert(0, "bq cr di ej kw mt os px uz gh")
+        plugboard_entry.grid(row=7, column=0, columnspan=10, pady=(0, 10))
+
+    if selected_version == 'Enigma M4 "Shark"':
+
+        reflector_label = tk.Label(settings_frame, text="Reflector: ")
+        reflector_label.grid(row=1, column=4, pady=5)
+        reflector_combobox = ttk.Combobox(settings_frame, values=["UKW B thin", "UKW C thin"], width=10, state="readonly")
+        reflector_combobox.set("UKW B thin")
+        reflector_combobox.grid(row=1, column=5, pady=5)
+
+        enigma_settings_frame = tk.Frame(settings_frame)
+        enigma_settings_frame.grid(row=2, column=0, columnspan=10)
+
+        rotor1_label = tk.Label(enigma_settings_frame, text="Rotor 1")
+        rotor1_label.grid(row=0, column=0)
+        rotor1_combobox = ttk.Combobox(enigma_settings_frame, values=["Beta", "Gamma"], width=7, state="readonly", justify="center")
+        rotor1_combobox.set("Beta")
+        rotor1_combobox.grid(row=1, column=0)
+        rotor2_label = tk.Label(enigma_settings_frame, text="Rotor 2")
+        rotor2_label.grid(row=2, column=0)
+        rotor2_combobox = ttk.Combobox(enigma_settings_frame, values=["I", "II", "III", "IV", "V", "VI", "VII", "VIII"], width=5, state="readonly", justify="center")
+        rotor2_combobox.set("I")
+        rotor2_combobox.grid(row=3, column=0)
+        rotor3_label = tk.Label(enigma_settings_frame, text="Rotor 3")
+        rotor3_label.grid(row=4, column=0)
+        rotor3_combobox = ttk.Combobox(enigma_settings_frame, values=["I", "II", "III", "IV", "V", "VI", "VII", "VIII"], width=5, state="readonly", justify="center")
+        rotor3_combobox.set("I")
+        rotor3_combobox.grid(row=5, column=0)
+        rotor4_label = tk.Label(enigma_settings_frame, text="Rotor 4")
+        rotor4_label.grid(row=6, column=0)
+        rotor4_combobox = ttk.Combobox(enigma_settings_frame, values=["I", "II", "III", "IV", "V", "VI", "VII", "VIII"], width=5, state="readonly", justify="center")
+        rotor4_combobox.set("I")
+        rotor4_combobox.grid(row=7, column=0)
+
+        enigma_settings_frame.columnconfigure(1, minsize=30)
+        enigma_settings_frame.columnconfigure(5, minsize=30)
+
+        position1_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position1_label.grid(row=0, column=3)
+        minus_button_position1 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position1.grid(row=1, column=2)
+        minus_button_position1.config(command=lambda: decrement(position1_entry))
+        position1_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position1_entry.grid(row=1, column=3)
+        plus_button_position1 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position1.grid(row=1, column=4)
+        plus_button_position1.config(command=lambda: increment(position1_entry))
+
+        ring1_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring1_label.grid(row=0, column=7, padx=10)
+        minus_button_ring1 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring1.grid(row=1, column=6)
+        minus_button_ring1.config(command=lambda: decrement(ring1_entry))
+        ring1_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring1_entry.grid(row=1, column=7)
+        plus_button_ring1 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring1.grid(row=1, column=8)
+        plus_button_ring1.config(command=lambda: increment(ring1_entry))
+
+        enigma_entry_set(position1_entry, 1)
+        enigma_entry_set(ring1_entry, 1)
+
+        position2_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position2_label.grid(row=2, column=3)
+        minus_button_position2 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position2.grid(row=3, column=2)
+        minus_button_position2.config(command=lambda: decrement(position2_entry))
+        position2_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position2_entry.grid(row=3, column=3)
+        plus_button_position2 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position2.grid(row=3, column=4)
+        plus_button_position2.config(command=lambda: increment(position2_entry))
+
+        ring2_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring2_label.grid(row=2, column=7, padx=10)
+        minus_button_ring2 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring2.grid(row=3, column=6)
+        minus_button_ring2.config(command=lambda: decrement(ring2_entry))
+        ring2_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring2_entry.grid(row=3, column=7)
+        plus_button_ring2 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring2.grid(row=3, column=8)
+        plus_button_ring2.config(command=lambda: increment(ring2_entry))
+
+        enigma_entry_set(position2_entry, 1)
+        enigma_entry_set(ring2_entry, 1)
+
+        position3_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position3_label.grid(row=4, column=3)
+        minus_button_position3 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position3.grid(row=5, column=2)
+        minus_button_position3.config(command=lambda: decrement(position3_entry))
+        position3_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position3_entry.grid(row=5, column=3)
+        plus_button_position3 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position3.grid(row=5, column=4)
+        plus_button_position3.config(command=lambda: increment(position3_entry))
+
+        ring3_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring3_label.grid(row=4, column=7, padx=10)
+        minus_button_ring3 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring3.grid(row=5, column=6)
+        minus_button_ring3.config(command=lambda: decrement(ring3_entry))
+        ring3_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring3_entry.grid(row=5, column=7)
+        plus_button_ring3 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring3.grid(row=5, column=8)
+        plus_button_ring3.config(command=lambda: increment(ring3_entry))
+
+        enigma_entry_set(position3_entry, 1)
+        enigma_entry_set(ring3_entry, 1)
+
+        position4_label = tk.Label(enigma_settings_frame, text="Poziție")
+        position4_label.grid(row=6, column=3)
+        minus_button_position4 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_position4.grid(row=7, column=2)
+        minus_button_position4.config(command=lambda: decrement(position4_entry))
+        position4_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        position4_entry.grid(row=7, column=3)
+        plus_button_position4 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_position4.grid(row=7, column=4)
+        plus_button_position4.config(command=lambda: increment(position4_entry))
+
+        ring4_label = tk.Label(enigma_settings_frame, text="Inel")
+        ring4_label.grid(row=6, column=7, padx=10)
+        minus_button_ring4 = ttk.Button(enigma_settings_frame, text="-", width=1)
+        minus_button_ring4.grid(row=7, column=6)
+        minus_button_ring4.config(command=lambda: decrement(ring4_entry))
+        ring4_entry = tk.Entry(enigma_settings_frame, width=5, justify="center", state="readonly")
+        ring4_entry.grid(row=7, column=7)
+        plus_button_ring4 = ttk.Button(enigma_settings_frame, text="+", width=1)
+        plus_button_ring4.grid(row=7, column=8)
+        plus_button_ring4.config(command=lambda: increment(ring4_entry))
+
+        enigma_entry_set(position4_entry, 1)
+        enigma_entry_set(ring4_entry, 1)
+
+        plugboard_label = tk.Label(enigma_settings_frame, text="Tablou comutator")
+        plugboard_label.grid(row=8, column=0, columnspan=10)
+        plugboard_entry = tk.Entry(enigma_settings_frame, width=30, justify="center")
+        plugboard_entry.insert(0, "bq cr di ej kw mt os px uz gh")
+        plugboard_entry.grid(row=9, column=0, columnspan=10, pady=(0, 10))
+
 
 def update_settings(combobox, settings_frame, entry_vals):
 
@@ -227,6 +666,51 @@ def update_settings(combobox, settings_frame, entry_vals):
 
         entry_vals["hashing_choice"] = hashing_choice
 
+    elif selected_algorithm == "AES":
+
+        aes_combobox = ttk.Combobox(settings_frame, values=["AES-128", "AES-256"], state="readonly", width=9)
+        aes_combobox.set("AES-128")
+        aes_combobox.grid(row=0, column=0, columnspan=5)
+        aes_textbox = Cw.LabeledTextbox(settings_frame, "Cheie de criptare:", "n", 3, 15, 1, 0, 1, 1)
+        entry_vals["aes_combobox"] = aes_combobox
+        entry_vals["aes_textbox"] = aes_textbox
+
+    elif selected_algorithm == "RC4":
+
+        rc4_textbox = Cw.LabeledTextbox(settings_frame, "Cheie de criptare:", "n", 3, 15, 0, 0, 1, 1)
+        entry_vals["rc4_textbox"] = rc4_textbox
+
+    elif selected_algorithm == "Playfair Cipher":
+
+        playfair_textbox = Cw.LabeledTextbox(settings_frame, "Cheie de criptare:", "n", 3, 15, 0, 0, 1, 1)
+        entry_vals["rc4_playfair"] = playfair_textbox
+
+    elif selected_algorithm == "Hill Cipher":
+
+        matrix_settings_frame = tk.Frame(settings_frame)
+        matrix_settings_frame.grid(row=0, column=0, columnspan=10)
+
+        size_combobox = ttk.Combobox(matrix_settings_frame, values=["2x2", "3x3"], state="readonly", width=3)
+        size_combobox.set("2x2")
+        size_combobox.grid(row = 0, column = 0, columnspan = 5)
+        size_combobox.bind("<<ComboboxSelected>>",lambda event: generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entry_vals))
+        entry_vals["size_combobox"] = size_combobox
+
+        generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entry_vals)
+
+    elif selected_algorithm == "Enigma":
+
+        enigma_settings_frame = tk.Frame(settings_frame)
+        enigma_settings_frame.grid(row=0, column=0, columnspan=10)
+
+        enigma_version_combobox = ttk.Combobox(enigma_settings_frame, values = ["Enigma I", "Enigma M3", 'Enigma M4 "Shark"'], width = 16, state="readonly")
+        enigma_version_combobox.set("Enigma I")
+        enigma_version_combobox.grid(row = 0, column = 0, columnspan = 10)
+        entry_vals["enigma_version_combobox"] = enigma_version_combobox
+        enigma_version_combobox.bind("<<ComboboxSelected>>",lambda event: generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals))
+
+        generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals)
+
 def verify_text(text):
 
     for char in text:
@@ -250,19 +734,25 @@ def verify_textbox_vigenere(text):
 def polybius_bifid_adfgvx_alphabet(entry_vals):
 
     alphabet = ""
-    duplicate_values = set()
-    for entry in entry_vals["polybius_entry"]:
+    for entry in entry_vals["matrix_entry"]:
         value = entry.get()
         if value == "":
             alphabet += "  "
         else:
-            if value in duplicate_values:
-                return
-            duplicate_values.add(value)
             alphabet += value
     return alphabet
 
-def verify_polybius_bifid_adfgvx(input_text, alphabet):
+def verify_duplicate_values(entry_vals):
+
+    duplicate_values = set()
+
+    for entry in entry_vals["matrix_entry"]:
+        value = entry.get()
+        if value in duplicate_values:
+            return "Matricea conține caractere duplicate!"
+        duplicate_values.add(value)
+
+def undefined_characters(input_text, alphabet):
 
     input_text = input_text.lower()
     alphabet = alphabet.lower()
@@ -273,10 +763,10 @@ def verify_polybius_bifid_adfgvx(input_text, alphabet):
         if char_text in special_cases:
             if "i" not in alphabet and "j" not in alphabet:
                 undefined_chars.add("i/j")
-        elif char_text != " " and char_text not in alphabet:
-            undefined_chars.add(char_text)
+        elif char_text != " "and char_text not in alphabet:
+                undefined_chars.add(char_text)
     if undefined_chars:
-        return undefined_chars
+        return f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}"
     else:
         return None
 
@@ -337,8 +827,9 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
 
     selected_algorithm = combobox.get()
     input_text = textbox1.get("1.0", "end-1c")
+    cleaned_text = input_text.replace("\n", " ")
+    cleaned_text = cleaned_text.replace("\t", " ")
     textbox2.config(state = NORMAL)
-
     if selected_algorithm == "Alege algoritmul":
         msgbox.showerror("Eroare", "Selectează un algoritm de criptare!")
 
@@ -348,7 +839,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         except ValueError:
             msgbox.showerror("Eroare", "Cheia trebuie să fie un număr întreg!")
             return
-        if not verify_text(input_text):
+        if not verify_text(cleaned_text):
             msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
             return
         if not verify_entry_caesar(shift_value):
@@ -356,7 +847,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
             return
 
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Basic.cezar(input_text, shift_value, 'criptare'))
+        textbox2.insert("end-1c", Basic.cezar(cleaned_text, shift_value, 'criptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Vigenère Cipher":
@@ -364,56 +855,59 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         if not verify_textbox_vigenere(key_value):
             msgbox.showerror("Eroare", "Cheia trebuie să conțină doar litere mari sau mici! (fără spații)")
             return
-        if not verify_text(input_text):
+        if not verify_text(cleaned_text):
             msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Basic.vignere(input_text, key_value, 'criptare'))
+        textbox2.insert("end-1c", Basic.vignere(cleaned_text, key_value, 'criptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Polybius":
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
-        if alphabet is None:
-            msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
+        error = verify_duplicate_values(entry_vals)
+        if error:
+            msgbox.showerror("Eroare", error)
             return
-        undefined_chars = verify_polybius_bifid_adfgvx(input_text, alphabet)
-        if verify_polybius_bifid_adfgvx(input_text, alphabet):
-            msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
+        error = undefined_characters(cleaned_text, alphabet)
+        if error:
+            msgbox.showerror("Eroare", error)
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Polybius.polybius(mesaj = input_text, alfabet = alphabet, operatie = 'criptare'))
+        textbox2.insert("end-1c", Polybius.polybius(mesaj = cleaned_text, alfabet = alphabet, operatie = 'criptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Bifid Cipher":
 
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
-        if alphabet is None:
-            msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
+        error = verify_duplicate_values(entry_vals)
+        if error:
+            msgbox.showerror("Eroare", error)
             return
-        undefined_chars = verify_polybius_bifid_adfgvx(input_text, alphabet)
-        if verify_polybius_bifid_adfgvx(input_text, alphabet):
-            msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
+        error = undefined_characters(cleaned_text, alphabet)
+        if error:
+            msgbox.showerror("Eroare", error)
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Polybius.bifid(input_text, alphabet, 'criptare'))
+        textbox2.insert("end-1c", Polybius.bifid(cleaned_text, alphabet, 'criptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "ADFGVX":
         key = entry_vals["adfgvx_textbox"].get("1.0", "end-1c")
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
-        if alphabet is None:
-            msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
+        error = verify_duplicate_values(entry_vals)
+        if error:
+            msgbox.showerror("Eroare", error)
             return
-        undefined_chars = verify_polybius_bifid_adfgvx(input_text, alphabet)
-        if verify_polybius_bifid_adfgvx(input_text, alphabet):
-            msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
+        error = undefined_characters(cleaned_text, alphabet)
+        if error:
+            msgbox.showerror("Eroare", error)
             return
-        error = verify_adfgvx_crypt(input_text, alphabet, key)
+        error = verify_adfgvx_crypt(cleaned_text, alphabet, key)
         if error:
             msgbox.showerror("Eroare", error)
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Polybius.adfgvx(input_text, alphabet, key, "criptare"))
+        textbox2.insert("end-1c", Polybius.adfgvx(cleaned_text, alphabet, key, "criptare"))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Hashing":
@@ -435,19 +929,27 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         if choice == "SHA-512":
 
             textbox2.delete("1.0", "end-1c")
-            textbox2.insert("end-1c", "SHA-512")    #aici inlocuiesti
+            textbox2.insert("end-1c", "SHA-512")
             textbox2.config(state = DISABLED)
 
         if choice == "MD5":
 
             textbox2.delete("1.0", "end-1c")
-            textbox2.insert("end-1c", "MD5")    #aici inlocuiesti
+            textbox2.insert("end-1c", "MD5")
             textbox2.config(state = DISABLED)
+
+    elif selected_algorithm == "AES":
+        ...
+
+    elif selected_algorithm == "RC4":
+        ...
 
 def decrypt(textbox1, textbox2, combobox, entry_vals):
 
     selected_algorithm = combobox.get()
     input_text = textbox1.get("1.0", "end-1c")
+    cleaned_text = input_text.replace("\n", " ")
+    cleaned_text = cleaned_text.replace("\t", " ")
     textbox2.config(state = NORMAL)
 
     if selected_algorithm == "Alege algoritmul":
@@ -460,14 +962,14 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
         except ValueError:
             msgbox.showerror("Eroare", "Cheia trebuie să fie un număr întreg!")
             return
-        if not verify_text(input_text):
+        if not verify_text(cleaned_text):
             msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
             return
         if not verify_entry_caesar(shift_value):
             msgbox.showerror("Eroare","Cheia trebuie să fie cuprinsă între -100 și 100!")
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Basic.cezar(input_text, shift_value, 'decriptare'))
+        textbox2.insert("end-1c", Basic.cezar(cleaned_text, shift_value, 'decriptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Vigenère Cipher":
@@ -476,57 +978,52 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
         if not verify_textbox_vigenere(key_value):
             msgbox.showerror("Eroare", "Cheia trebuie să conțină doar litere mari sau mici! (fără spații)")
             return
-        if not verify_text(input_text):
+        if not verify_text(cleaned_text):
             msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Basic.vignere(input_text, key_value, 'decriptare'))
+        textbox2.insert("end-1c", Basic.vignere(cleaned_text, key_value, 'decriptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Polybius":
 
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
-        if alphabet is None:
-            msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
+        error = verify_duplicate_values(entry_vals)
+        if error:
+            msgbox.showerror("Eroare", error)
             return
-        error = verify_polybius_decrypt(input_text, entry_vals)
+        error = verify_polybius_decrypt(cleaned_text, entry_vals)
         if error:
             msgbox.showerror("Eroare", error)
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Polybius.polybius(mesaj = input_text, alfabet = alphabet, operatie = 'decriptare'))
+        textbox2.insert("end-1c", Polybius.polybius(mesaj = cleaned_text, alfabet = alphabet, operatie = 'decriptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Bifid Cipher":
 
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
-        if alphabet is None:
-            msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
-            return
-        undefined_chars = verify_polybius_bifid_adfgvx(input_text, alphabet)
-        if verify_polybius_bifid_adfgvx(input_text, alphabet):
-            msgbox.showerror("Eroare", f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
+        error = verify_duplicate_values(entry_vals)
+        if error:
+            msgbox.showerror("Eroare", error)
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Polybius.bifid(input_text, alphabet, 'decriptare'))
+        textbox2.insert("end-1c", Polybius.bifid(cleaned_text, alphabet, 'decriptare'))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "ADFGVX":
         key = entry_vals["adfgvx_textbox"].get("1.0", "end-1c")
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
-        if alphabet is None:
-            msgbox.showerror("Eroare", "Matricea conține caractere duplicate!")
+        error = verify_duplicate_values(entry_vals)
+        if error:
+            msgbox.showerror("Eroare", error)
             return
-        undefined_chars = verify_polybius_bifid_adfgvx(input_text, alphabet)
-        if verify_polybius_bifid_adfgvx(input_text, alphabet):
-            msgbox.showerror("Eroare",f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}")
-            return
-        error = verify_adfgvx_decrypt(input_text, key)
+        error = verify_adfgvx_decrypt(cleaned_text, key)
         if error:
             msgbox.showerror("Eroare", error)
             return
         textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Polybius.adfgvx(input_text, alphabet, key, "decriptare"))
+        textbox2.insert("end-1c", Polybius.adfgvx(cleaned_text, alphabet, key, "decriptare"))
         textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Hashing":
@@ -534,15 +1031,23 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
         msgbox.showerror("Eroare", "Nu există decriptare pentru algoritmii de hashing!")
         return
 
+    elif selected_algorithm == "AES":
+        ...
+
+    elif selected_algorithm == "RC4":
+        ...
+
 def brute_force_caesar(textbox1, textbox2):
 
     input_text = textbox1.get("1.0", "end-1c")
+    cleaned_text = input_text.replace("\n", " ")
+    cleaned_text = cleaned_text.replace("\t", " ")
     textbox2.config(state = NORMAL)
 
-    if not verify_text(input_text):
+    if not verify_text(cleaned_text):
         msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
         return
-    string_list = Basic.cezar(input_text, None, 'spargere')
+    string_list = Basic.cezar(cleaned_text, None, 'spargere')
     textbox2.delete("1.0", "end-1c")
     for i, strings in enumerate(string_list, start=1):
         textbox2.insert("end", f"{i}. {strings}\n")
@@ -571,7 +1076,7 @@ def main():
     settings_frame = tk.Frame(root)
     settings_frame.grid(row = 1, column = 1, sticky = "n")
 
-    combobox = ttk.Combobox(options_frame, values = ["Caesar Cipher","Vigenère Cipher", "Polybius", "Bifid Cipher", "ADFGVX", "Hashing"], state = "readonly")
+    combobox = ttk.Combobox(options_frame, values = ["Caesar Cipher","Vigenère Cipher", "Polybius", "Bifid Cipher", "ADFGVX", "Hashing", "AES", "RC4", "Playfair Cipher", "Hill Cipher", "Enigma"], state = "readonly")
     combobox.set("Alege algoritmul")
     combobox.grid(row = 0, column = 0, columnspan = 2)
     combobox.bind("<<ComboboxSelected>>", lambda event: update_settings(combobox, settings_frame, entry_vals))
