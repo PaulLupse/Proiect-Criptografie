@@ -671,9 +671,15 @@ def update_settings(combobox, settings_frame, entry_vals):
         aes_combobox = ttk.Combobox(settings_frame, values=["AES-128", "AES-256"], state="readonly", width=9)
         aes_combobox.set("AES-128")
         aes_combobox.grid(row=0, column=0, columnspan=5)
-        aes_textbox = Cw.LabeledTextbox(settings_frame, "Cheie de criptare:", "n", 3, 15, 1, 0, 1, 1)
+        aes_key_label = tk.Label(settings_frame, text = "Format cheie")
+        aes_key_label.grid(row=1, column=0, columnspan=5, pady=(10,0))
+        aes_key_combobox = ttk.Combobox(settings_frame, values=["String", "Hexazecimal"], state="readonly", width=11)
+        aes_key_combobox.set("String")
+        aes_key_combobox.grid(row=2, column=0, columnspan=5)
+        aes_textbox = Cw.LabeledTextbox(settings_frame, "Cheie de criptare:", "n", 3, 15, 3, 0, 1, 1)
         entry_vals["aes_combobox"] = aes_combobox
         entry_vals["aes_textbox"] = aes_textbox
+        entry_vals["aes_key"] = aes_key_combobox
 
     elif selected_algorithm == "RC4":
 
