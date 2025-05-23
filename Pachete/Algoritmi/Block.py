@@ -162,6 +162,7 @@ def __expansioneaza_cheia(cheie):
     lung_cheie = len(cheie)
     marime_cheie = lung_cheie/8
 
+    # initial, impartim cheia in 4 sau 8 cuvinte, fiecare cuvant avand 32 biti (4 octeti, 8 valori hexa)
     for i in range(0, lung_cheie, 8):
         cuvant = int(cheie[i:i + 8:], 16)
         cuvinte_cheie.append(cuvant)
@@ -213,10 +214,14 @@ def __adauga_padding(octeti_mesaj):
             octeti_mesaj.append(pad)
 
 # aes-128, modul EBC cu padding pkcs#7
-def aes_128(mesaj, cheie, operatie):
+def aes(mesaj, cheie, format_cheie, operatie):
 
-    # initial, impartim cheia in 4 cuvinte, fiecare cuvant avand 32 biti (4 octeti, 8 valori hexa)
-    # apoi o expansionam
+    if format_cheie == 'string':
+        hex_cheie = ''
+        for litera in cheie:
+            hex_cheie += hex(ord(litera))[2::]
+        cheie = hex_cheie
+
     cuvinte_cheie = __expansioneaza_cheia(cheie)
 
     # criptarea propriu-zisa
@@ -306,15 +311,9 @@ def aes_128(mesaj, cheie, operatie):
 
         return mesaj_decriptat
 
-
-
-    #for i in range(0, 44, 4):
-    #    print(hex(cuvinte[i]), hex(cuvinte[i + 1]), hex(cuvinte[i + 2]), hex(cuvinte[i + 3]))
-
-
 if __name__ == '__main__':
 
-    a = aes_128('eca4a74ae9a7ab4b8785ecbfea01e4e2 d7ece1b0f9a13ff6eeb7ffb0866c7919 e93c747ce2c953af60f5d96a085fa6ec 6f9284d31756e8cff45a3f08da8d5db8', '5468617473206D79204B756E672046755468617473206D79204B756E67204675'.lower().replace(' ', ''), 'decriptare')
+    a = aes('eca4a74ae9a7ab4b8785ecbfea01e4e2 d7ece1b0f9a13ff6eeb7ffb0866c7919 e93c747ce2c953af60f5d96a085fa6ec 6f9284d31756e8cff45a3f08da8d5db8', '5468617473206D79204B756E672046755468617473206D79204B756E67204675'.lower().replace(' ', ''), 'hex', 'decriptare')
     print(a)
     '''a = np.array([[0x63, 0xEB, 0x9F, 0xA0],
                   [0x2F, 0x93, 0x92, 0xC0],

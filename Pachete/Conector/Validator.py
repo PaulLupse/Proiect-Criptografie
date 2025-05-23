@@ -5,6 +5,12 @@ from ..Algoritmi import DigrafSub
 from ..Algoritmi import Rivest
 from ..Algoritmi import Hashing
 from ..Algoritmi import Block
+from ..Utilități import Utilities
+
+# functiile de validare returneaza o valoare diferita de 0 daca este gasita vreo eroare
+# astfel, la validare, verificam daca functia returneaza ceva
+# daca da, atunci avem o Eroare: deci o returnam, impreuna cu codul 1
+# daca nu este gasita nicio Eroare: este returnat mesajul criptat/decriptat/spart impreuna cu codul 0
 
 def _verify_duplicate_values(entry_vals):
 
@@ -15,6 +21,8 @@ def _verify_duplicate_values(entry_vals):
         if value in duplicate_values:
             return "Matricea conține caractere duplicate!", 1
         duplicate_values.add(value)
+
+    return None
 
 def _undefined_characters(input_text, alphabet):
 
@@ -148,15 +156,7 @@ def _valideaza_adfgvx(input_text, optiuni):
 
     return Polybius.adfgvx(input_text, alphabet, key, optiuni['operatie'])
 
-def is_string(message):
-    if type(message) is not str:
-        return False
-    else:
-        return True
-
-def playfair_validation_plain(message):
-    if not is_string(message):
-        return f"Eroare, {message} nu este un sir de caractere."
+def _playfair_validation_plain(message):
 
     valid_chars = [" "]
 
@@ -168,13 +168,11 @@ def playfair_validation_plain(message):
 
     for letter in message:
         if letter not in valid_chars:
-            return "Eroare, mesajul tău conține caractere invalide."
+            return f"Eroare: mesajul tău conține caractere invalide: {letter}."
 
     return message
 
-def playfair_validation_cypher(message):
-    if not is_string(message):
-        return f"Eroare, {message} nu este un sir de caractere."
+def _playfair_validation_cypher(message):
 
     valid_chars = []
 
@@ -183,55 +181,240 @@ def playfair_validation_cypher(message):
 
     for letter in message:
         if letter not in valid_chars:
-            return "Eroare, mesajul tău conține caractere invalide."
+            return f"Eroare: mesajul tău conține caractere invalide:{letter}."
 
     return message
 
-def key_validation_playfair(key):
-    if not is_string(key):
-        return f"Eroare, {key} nu este un sir de caractere."
+def _key_validation_playfair(key):
 
     valid_chars = []
-    used_chars = []
 
     for LOWER_letter in range(97, 123):
         valid_chars.append(chr(LOWER_letter))
 
     for letter in key:
-        if letter in used_chars:
-            letter_freq = key.count(letter)
-            return f"Eroare, cheia nu poate avea caractere care se repetă, caracterul \"{letter}\" a fost găsit de {letter_freq} ori."
         if letter not in valid_chars:
-            return "Eroare, mesajul tău conține caractere invalide."
-        used_chars.append(letter)
+            return f"Eroare: mesajul tău conține caractere invalide: {letter}."
 
-    return key
+    return None
 
-def _valideaza_playfair(message, optiuni):
+def _valideaza_playfair(input_text, optiuni):
 
     mod = optiuni['operatie']
-    key = optiuni['cheie']
+    cheie = optiuni['cheie']
 
-    error_statement = "Nu au fost îndeplinite toate condițiile de formatare"
-    if key_validation_playfair(key) != key:
-        return error_statement
+    valid_chars = [" "]
 
-    if mod == "criptare":
-        return playfair_validation_plain(message)
+    for LOWER_letter in range(97, 123):
+        valid_chars.append(chr(LOWER_letter))
 
-    elif mod == "decriptare":
-        return playfair_validation_cypher(message)
+    for UPPER_letter in range(65, 91):
+        valid_chars.append(chr(UPPER_letter))
+
+    for letter in input_text:
+        if letter not in valid_chars:
+            return f"Eroare: mesajul tău conține caractere invalide:{letter}.", 1
+
+    rez = _key_validation_playfair(cheie)
+    if rez:
+        return rez, 1
+
+    return DigrafSub.playfair(input_text, cheie, mod)
+
+def _hill_validation_key(key):
+    key_len = len(key)
+
+    if key_len != 4 and key_len != 9:
+        return f"Cheia {key} nu are strict 4 sau 9 caractere."
+    elif key_len == 4:
+        square_matrix2 = []
+        k = 0
+
+        for i in range(2):
+            row = []
+            for j in range(2):
+                row.append(ord(key[k]))
+                k += 1
+            square_matrix2.append(row)
+
+
+        delta = Utilities.second_order_det(square_matrix2)
+
+        if delta == 0:
+            return f"Matricea {square_matrix2} nu este inversabilă, determinantul este egal cu {delta}. Schimbarea unui caracter poate rezolva eroarea."
 
     else:
-        return "Modul ales nu este valid."
+        square_matrix3 = []
+        k = 0
+
+        for i in range(3):
+            row = []
+            for j in range(3):
+                row.append(ord(key[k]))
+                k += 1
+            square_matrix3.append(row)
+
+        delta = Utilities.third_order_det(square_matrix3)
+
+        if delta == 0:
+            return f"Matricea {square_matrix3} nu este inversabilă, pentru că determinantul este egal cu: {delta}. Schimbarea unui caracter poate rezolva eroarea."
+
+    return None
+
+def _valideaza_hill(input_text, optiuni):
+
+    valid_chars = [" "]
+
+    for LOWER_letter in range(97, 123):
+        valid_chars.append(chr(LOWER_letter))
+
+    for UPPER_letter in range(65, 91):
+        valid_chars.append(chr(UPPER_letter))
+
+    for letter in input_text:
+        if letter not in valid_chars:
+            return f"Mesajul tău conține caractere invalide: {letter}", 1
+
+    cheie = optiuni['cheie']
+    mod = optiuni['operatie']
+
+    rez = _hill_validation_key(cheie)
+    if rez:
+        return rez, 1
+
+    return DigrafSub.hill(input_text, cheie, mod), 0
+
+def rc4_validation_plain(message):
+    return None
+
+def rc4_validation_cypher(message):
+
+    valid_chars = []
+
+    for LOWER_letter in range(97, 103):
+        valid_chars.append(chr(LOWER_letter))
+
+    for digit in range(48, 58):
+        valid_chars.append(chr(digit))
+
+    for i in range(0, len(message)):
+        if message[i] not in valid_chars:
+            return f"Eroare: mesajul tău conține caractere invalide:{message[i]}"
+
+    return None
+
+def key_validation(key):
+    return None
+
+def _valideaza_rc4(input_text, optiuni):
+
+    cheie = optiuni['cheie']
+    mod = optiuni['operatie']
+
+    if mod == "decriptare":
+        rez = rc4_validation_cypher(input_text)
+        if rez:
+            return rez, 1
+
+    return Rivest.rc4(input_text, cheie, mod), 0
+
+def aes128_validation_cypher(message):
+
+    if len(message.replace(" ", "")) % 2 != 0:
+        return f"Eroare: mesajul este de lungime invalidă."
+
+    valid_chars = [' ']
+
+    for LOWER_letter in range(97, 103):
+        valid_chars.append(chr(LOWER_letter))
+
+    for digit in range(48, 58):
+        valid_chars.append(chr(digit))
+
+    for i in range(0, len(message)):
+        if message[i] not in valid_chars:
+            return f"Eroare: mesajul tău conține caractere invalide:{message[i]}."
+        else:
+            pass
+
+    return None
+
+def key_validation_aes(key, expected_length, format):
+
+    valid_chars = []
+
+    if format == 'hex':
+        for LOWER_letter in range(97, 103):
+            valid_chars.append(chr(LOWER_letter))
+
+        for digit in range(48, 58):
+            valid_chars.append(chr(digit))
+
+        for i in range(0, len(key)):
+            if key[i] not in valid_chars:
+                return f"Eroare: mesajul tău conține caractere invalide:{key[i]}"
+
+    if format == 'hex':
+        expected_length *= 2
+
+    key_len = len(key)
+    if int(key_len) != expected_length:
+        return f"Cheia {key} nu are strict {expected_length} caractere"
+    return None
+
+def _valideaza_aes(input_text, optiuni):
+
+    mod = optiuni['operatie']
+    cheie = optiuni['cheie']
+    tip = optiuni['tip']
+    format_cheie = optiuni['format_cheie']
+
+    expected_length = 16 if tip == '128' else 32
+
+    rez = key_validation_aes(cheie, expected_length, format_cheie)
+    if rez:
+        return rez, 1
+
+    if mod == "decriptare":
+        rez = aes128_validation_cypher(input_text)
+        if rez:
+            return rez, 1
+
+    return Block.aes(input_text, cheie, format_cheie, mod), 0
+
+def _hashing(input_text, optiuni):
+
+    varianta = optiuni['varianta']
+    if varianta == 'SHA-1':
+        return Hashing.sha_1(input_text)
+    elif varianta == 'SHA-256':
+        return Hashing.sha_256(input_text)
+
+    return None
 
 def main_validator(nume_algoritm, text_intrare, optiuni):
 
     dictionar_validatori = {'cezar':_valideaza_cezar, 'vigenere':_valideaza_vigenere, 'polybius':_valideaza_polybius,
-                            'adfgvx':_valideaza_adfgvx, 'bifid':_valideaza_bifid, 'playfair':None,
-                            'hill':None, 'rc4':None,
-                            'aes':None}
+                            'adfgvx':_valideaza_adfgvx, 'bifid':_valideaza_bifid, 'playfair':_valideaza_playfair,
+                            'hill':_valideaza_hill, 'rc4':_valideaza_rc4,'aes':_valideaza_aes}
+
+    # verificari preliminatorii
+
+    if nume_algoritm not in dictionar_validatori.keys():
+        raise ValueError("Numele algoritmului nu este definit.")
+
+    if type(optiuni) != dict:
+        raise ValueError("Argumentul 'optiuni' trebuie sa fie de tip dict!")
+
+    if optiuni['operatie'] not in ('criptare', 'decriptare', 'spargere'):
+        raise ValueError("Operatia trebuie sa fie 'criptare', 'decriptare' sau 'spargere'.")
 
     return dictionar_validatori[nume_algoritm](text_intrare, optiuni)
+
+eptiuni = {'cheie':'lwerft4eol'.lower().replace(' ', ''), 'operatie':'decsefdrygsefdgriptare'}
+if __name__ == '__main__':
+    a = main_validator('rc4', '02b446se5rtdfgbdrt2e13f69e71eb40fa', eptiuni)
+    print(a)
+
 
 
