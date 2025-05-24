@@ -1,18 +1,14 @@
 import numpy as np
 from BitVector import BitVector as Bv
 
+# functie ce efectueaza o rotatie circulara spre stanga
+# a bitilor unui numar intreg, pe 32 de biti
 def __st_rot(numar, nr_pos):
 
     bin_numar = bin(numar)[2::]
     bin_numar = ('0' * (32 - len(bin_numar))) + bin_numar
     bin_numar = bin_numar[nr_pos::] + bin_numar[:nr_pos:]
     return int(bin_numar, 2)
-
-def __dr_rot(numar, nr_pos):
-    bin_numar = bin(numar)[2::]
-    bin_numar = '0' * (32 - len(bin_numar)) + bin_numar
-    bin_numar = bin_numar[-nr_pos::] + bin_numar[:-nr_pos:]
-    return np.uint32(int(bin_numar, 2))
 
 s_box = (
             0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
@@ -51,12 +47,17 @@ s_box_inv = (
             0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D
             )
 
+# functie ce returneaza valoarea din s_box
+# in functie de scrierea octetului in hexa
 def get_s_box_value(octet):
+
     linie = octet // 16
     coloana = octet % 16
     rez = int(s_box[linie * 16 + coloana])
     return rez
 
+# functie ce returneaza valoarea din inv_s_box
+# in functie de scrierea octetului in hexa
 def get_inv_s_box_value(octet):
     linie = octet // 16
     coloana = octet % 16
@@ -67,6 +68,7 @@ constanta_runda = (0x00000000, 0x01000000, 0x02000000, 0x04000000,
                    0x08000000,	0x10000000,	0x20000000,	0x40000000,
                    0x80000000,	0x1B000000,	0x36000000)
 
+# substituieste octetii dintr-un (dublu)cuvant cu valorile din s_box
 def __substituire_cuvant(cuvant):
 
     octet1 = get_s_box_value(cuvant % 16 ** 2)
@@ -76,6 +78,7 @@ def __substituire_cuvant(cuvant):
 
     return octet4 * (16 ** 6) + octet3 * (16 ** 4) + octet2 * (16 ** 2) + octet1
 
+# functie speciala, folosita la expansiunea cheii de criptare
 def g(cuvant, runda):
 
     cuvant = __substituire_cuvant(cuvant)
@@ -83,6 +86,7 @@ def g(cuvant, runda):
 
     return cuvant ^ constanta_runda[runda]
 
+# functie care returneaza octetii unui (dublu)cuvant
 def __get_octeti(cuvant):
     octet1 = cuvant % 16 ** 2
     octet2 = (cuvant % 16 ** 4) // (16 ** 2)
@@ -90,35 +94,48 @@ def __get_octeti(cuvant):
     octet4 = cuvant // (16 ** 6)
     return octet4, octet3, octet2, octet1
 
+# functie care substituieste octetii din stare_mesaj
+# cu valorile din s_box
 def __substituire(stare_mesaj):
     for j in range(0, 4):
         for i in range(0, 4):
             stare_mesaj[i][j] = get_s_box_value(stare_mesaj[i][j])
 
+# functie care substituieste octetii din stare_mesaj
+# cu valorile din inv_s_box
 def __inv_substituire(stare_mesaj):
     for j in range(0, 4):
         for i in range(0, 4):
             stare_mesaj[i][j] = get_inv_s_box_value(stare_mesaj[i][j])
 
+# functie ce efectueaza o deplasare criculara spre dreapta a liniilor starii mesajului
 def __schimba_linii(stare_mesaj):
-    stare_mesaj[1][0], stare_mesaj[1][1], stare_mesaj[1][2], stare_mesaj[1][3] = stare_mesaj[1][1], stare_mesaj[1][2], stare_mesaj[1][3], stare_mesaj[1][0]
-    stare_mesaj[2][0], stare_mesaj[2][1], stare_mesaj[2][2], stare_mesaj[2][3] = stare_mesaj[2][2], stare_mesaj[2][3], stare_mesaj[2][0], stare_mesaj[2][1]
-    stare_mesaj[3][0], stare_mesaj[3][1], stare_mesaj[3][2], stare_mesaj[3][3] = stare_mesaj[3][3], stare_mesaj[3][0], stare_mesaj[3][1], stare_mesaj[3][2]
 
+    stare_mesaj[1][0], stare_mesaj[1][1], stare_mesaj[1][2], stare_mesaj[1][3] = stare_mesaj[1][1], stare_mesaj[1][2], stare_mesaj[1][3], stare_mesaj[1][0] # prima linie este deplasata circular cu o pozitie
+    stare_mesaj[2][0], stare_mesaj[2][1], stare_mesaj[2][2], stare_mesaj[2][3] = stare_mesaj[2][2], stare_mesaj[2][3], stare_mesaj[2][0], stare_mesaj[2][1] # prima linie este deplasata circular cu doua pozitii
+    stare_mesaj[3][0], stare_mesaj[3][1], stare_mesaj[3][2], stare_mesaj[3][3] = stare_mesaj[3][3], stare_mesaj[3][0], stare_mesaj[3][1], stare_mesaj[3][2] # prima linie este deplasata circular cu trei pozitii
+
+# functie ce efectueaza o deplasare criculara spre stanga a liniilor starii mesajului
 def __inv_schimba_linii(stare_mesaj):
-    stare_mesaj[1][0], stare_mesaj[1][1], stare_mesaj[1][2], stare_mesaj[1][3] = stare_mesaj[1][3], stare_mesaj[1][0], stare_mesaj[1][1], stare_mesaj[1][2]
-    stare_mesaj[2][0], stare_mesaj[2][1], stare_mesaj[2][2], stare_mesaj[2][3] = stare_mesaj[2][2], stare_mesaj[2][3], stare_mesaj[2][0], stare_mesaj[2][1]
-    stare_mesaj[3][0], stare_mesaj[3][1], stare_mesaj[3][2], stare_mesaj[3][3] = stare_mesaj[3][1], stare_mesaj[3][2], stare_mesaj[3][3], stare_mesaj[3][0]
 
+    stare_mesaj[1][0], stare_mesaj[1][1], stare_mesaj[1][2], stare_mesaj[1][3] = stare_mesaj[1][3], stare_mesaj[1][0], stare_mesaj[1][1], stare_mesaj[1][2] # prima linie este deplasata circular cu o pozitie
+    stare_mesaj[2][0], stare_mesaj[2][1], stare_mesaj[2][2], stare_mesaj[2][3] = stare_mesaj[2][2], stare_mesaj[2][3], stare_mesaj[2][0], stare_mesaj[2][1] # prima linie este deplasata circular cu doua pozitii
+    stare_mesaj[3][0], stare_mesaj[3][1], stare_mesaj[3][2], stare_mesaj[3][3] = stare_mesaj[3][1], stare_mesaj[3][2], stare_mesaj[3][3], stare_mesaj[3][0] # prima linie este deplasata circular cu trei pozitii
+
+# functie care adauga cheia de runda la starea mesajului
 def __adauga_cheie(stare_mesaj, cuvinte, runda):
+
     for j in range(0, 4):
         octeti = __get_octeti(cuvinte[4 * runda + j])
         for i in range(0, 4):
             stare_mesaj[i][j] = stare_mesaj[i][j] ^ octeti[i]
 
-MOD = Bv(bitstring='100011011')
+MOD = Bv(bitstring='100011011') # necesar pentru inmultirea in campul Galois
 matrice_mixare = np.array([[0x2, 0x3, 0x1, 0x1],[0x1, 0x2, 0x3, 0x1],[0x1, 0x1, 0x2, 0x3],[0x3, 0x1, 0x1, 0x2]], dtype = int)
 
+# functie ce efectueaza mixarea coloanelor
+# adica o inmultire a starii mesajului cu matricea de mixare
+# inmultire realizata in camp finit
 def __mixeaza_coloane(stare_mesaj):
 
     rezultat = np.zeros((4, 4), dtype = int)
@@ -139,6 +156,9 @@ matrice_mixare_inv = np.array([[0x0E, 0x0B, 0x0D, 0x09],
 [0x0D, 0x09, 0x0E, 0x0B],
 [0x0B, 0x0D, 0x09, 0x0E]], dtype = int)
 
+# functie ce efectueaza inversa mixarii coloanelor
+# adica o inmultire a starii mesajului cu inversa matricei de mixare
+# inmultire realizata in camp finit
 def __inv_mixeaza_coloane(stare_mesaj):
 
     rezultat = np.zeros((4, 4), dtype = int)
@@ -155,6 +175,8 @@ def __inv_mixeaza_coloane(stare_mesaj):
     return rezultat
 
 # 1 cuvant == 4 octeti
+# functie ce realizeaza expansiunea cheii
+# returneaza o lista de (dublu)cuvinte, reprezentand (dublu)cuvintele cheilor de runda
 def __expansioneaza_cheia(cheie):
 
     cuvinte_cheie = [] # lista ce memoreaza cheia + cheile de runde generate ulterior
@@ -163,6 +185,7 @@ def __expansioneaza_cheia(cheie):
     marime_cheie = lung_cheie/8
 
     # initial, impartim cheia in 4 sau 8 cuvinte, fiecare cuvant avand 32 biti (4 octeti, 8 valori hexa)
+    # 4 cuvinte pentru aes-128, 8 cuvinte pt aes-256
     for i in range(0, lung_cheie, 8):
         cuvant = int(cheie[i:i + 8:], 16)
         cuvinte_cheie.append(cuvant)
@@ -181,7 +204,7 @@ def __expansioneaza_cheia(cheie):
             cuvinte_cheie.append(cuvant3)
 
     elif marime_cheie == 8: # aes-256
-        for runda in range(1, 9):
+        for runda in range(1, 9): # sunt necesare mai putine runde deoarece generam cate 8 (dublu)cuvinte per iteratie
             i = runda * 8
             cuvant0 = cuvinte_cheie[i - 8] ^ g(cuvinte_cheie[i - 1], runda)
             cuvant1 = cuvant0 ^ cuvinte_cheie[i - 7]
@@ -213,22 +236,26 @@ def __adauga_padding(octeti_mesaj):
         for i in range(0, pad):
             octeti_mesaj.append(pad)
 
-# aes-128, modul EBC cu padding pkcs#7
+# aes-128 sau aes-256 in functie de marimea cheii
+# modul EBC cu padding pkcs#7
 def aes(mesaj, cheie, format_cheie, operatie):
 
+    # daca cheia este de format string, este convertita la format hexa
     if format_cheie == 'string':
         hex_cheie = ''
         for litera in cheie:
             hex_cheie += hex(ord(litera))[2::]
         cheie = hex_cheie
 
+    # expansionam cheia pentru a putea cuprinde toate rundele de criptare
     cuvinte_cheie = __expansioneaza_cheia(cheie)
 
     # criptarea propriu-zisa
     if operatie == 'criptare':
 
+        # consideram octetii mesajului
         octeti_mesaj = [ord(caracter) for caracter in mesaj]
-        __adauga_padding(octeti_mesaj)
+        __adauga_padding(octeti_mesaj) # adaugam padding
 
         blocuri_mesaj = []
         for i in range(0, len(octeti_mesaj), 16): # impartim mesajul in blocuri de cate 16 octeti (16 caractere)
@@ -244,8 +271,11 @@ def aes(mesaj, cheie, format_cheie, operatie):
                     stare_mesaj[i][j] = bloc_mesaj[index_octeti]
                     index_octeti += 1
 
+            # adaugam cheia initiala
             __adauga_cheie(stare_mesaj, cuvinte_cheie, 0)
 
+            # pentru cheie de lungime de 32 de valori hexa (16 octeti, 128 biti): 11 runde
+            # pentru cheie de lungime de 64 de valori hexa (32 octeti, 256 biti): 15 runde
             runde = 10 if len(cheie) == 32 else 14
             for runda in range(1, runde):
 
@@ -254,13 +284,15 @@ def aes(mesaj, cheie, format_cheie, operatie):
                 stare_mesaj = __mixeaza_coloane(stare_mesaj)
                 __adauga_cheie(stare_mesaj, cuvinte_cheie, runda)
 
+            # mixarea coloanelor este omisa in ultima runda
+            # deoarece a fost dovedit ca nu contribuie la calitatea criptarii
             __substituire(stare_mesaj)
             __schimba_linii(stare_mesaj)
             __adauga_cheie(stare_mesaj, cuvinte_cheie, runde)
 
             for j in range(0, 4):
                 for i in range(0, 4):
-                    if stare_mesaj[i][j] < 16:
+                    if stare_mesaj[i][j] < 16: # pading daca octetul de pe aceasta pozitie este mai mic decat 16
                         mesaj_criptat += '0'
                     mesaj_criptat += hex(stare_mesaj[i][j])[2::]
             mesaj_criptat += ' '
@@ -280,15 +312,17 @@ def aes(mesaj, cheie, format_cheie, operatie):
             blocuri_mesaj.append(octeti_mesaj[i:i + 16:])
 
         mesaj_decriptat = ''
-        for bloc_mesaj in blocuri_mesaj:
+        for bloc_mesaj in blocuri_mesaj: # aplicam decriptare pt fiecare bloc de 16 octeti
             stare_mesaj = np.zeros((4, 4), dtype=int)  # matrice care memoreaza toti 16 octeti ai mesajului
-
+                                                              # care isi schimba valorile pe parcurs
             index_octeti = 0
             for j in range(0, 4):
                 for i in range(0, 4):
                     stare_mesaj[i][j] = bloc_mesaj[index_octeti]
                     index_octeti += 1
 
+            # pentru cheie de lungime de 32 de valori hexa (16 octeti, 128 biti): 11 runde
+            # pentru cheie de lungime de 64 de valori hexa (32 octeti, 256 biti): 15 runde
             runde = 9 if len(cheie) == 32 else 13
             __adauga_cheie(stare_mesaj, cuvinte_cheie, runde + 1)
 
@@ -299,13 +333,14 @@ def aes(mesaj, cheie, format_cheie, operatie):
                 __adauga_cheie(stare_mesaj, cuvinte_cheie, runda)
                 stare_mesaj = __inv_mixeaza_coloane(stare_mesaj)
 
+            # (de)mixarea coloanelor este omisa in ultima runda
             __inv_schimba_linii(stare_mesaj)
             __inv_substituire(stare_mesaj)
             __adauga_cheie(stare_mesaj, cuvinte_cheie, 0)
 
             for j in range(0, 4):
                 for i in range(0, 4):
-                    if stare_mesaj[i][j] > 16:
+                    if stare_mesaj[i][j] > 16: # pading daca octetul de pe aceasta pozitie este mai mic decat 16
                         mesaj_decriptat += chr(int(stare_mesaj[i][j]))
             mesaj_decriptat += ''
 
@@ -315,12 +350,3 @@ if __name__ == '__main__':
 
     a = aes('eca4a74ae9a7ab4b8785ecbfea01e4e2 d7ece1b0f9a13ff6eeb7ffb0866c7919 e93c747ce2c953af60f5d96a085fa6ec 6f9284d31756e8cff45a3f08da8d5db8', '5468617473206D79204B756E672046755468617473206D79204B756E67204675'.lower().replace(' ', ''), 'hex', 'decriptare')
     print(a)
-    '''a = np.array([[0x63, 0xEB, 0x9F, 0xA0],
-                  [0x2F, 0x93, 0x92, 0xC0],
-                  [0xAF, 0xC7, 0xAB, 0x30],
-                  [0xA2, 0x20, 0xCB, 0x2B]])'''
-
-#Two one nine two
-#29c3505f571420f6402299b31a02d73a
-#29C3505F571420F6402299B31A02D73A
-#5468617473206D79204B756E67204675

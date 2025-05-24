@@ -2,15 +2,6 @@ import numpy as np
 import math
 from functools import cmp_to_key
 
-def __sterge_spatii(mesaj):
-    i = 0
-    while i < len(mesaj):
-        if mesaj[i] == ' ':
-            mesaj = mesaj[0:i:] + mesaj[i + 1::]
-        else:
-            i += 1
-    return mesaj
-
 # mesajul este format strict din caracterele ce apar in alfabet
 # alfabet-ul poate contine litere (a-z), cifre (0-9) si/sau caractere speciale (alese de utilizator)
 def polybius(mesaj, alfabet, operatie):
@@ -100,7 +91,7 @@ def bifid(mesaj, alfabet, operatie):
             k += 1
 
     if ' ' not in cod_caracter.keys():
-        mesaj = __sterge_spatii(mesaj)
+        mesaj = mesaj.replace(' ', '')
 
     if operatie == 'criptare':
 
@@ -151,6 +142,7 @@ def bifid(mesaj, alfabet, operatie):
         return mesaj_decriptat
 
 def __compara_coloane(col1, col2): # compara doua coloane, vectori de caractere din numpy
+
     ord1 = col1[-1]
     ord2 = col2[-1]
     if ord1 < ord2:
@@ -160,7 +152,8 @@ def __compara_coloane(col1, col2): # compara doua coloane, vectori de caractere 
     else:
         return 1
 
-def __compara_coloane_2(col1, col2):
+def __compara_coloane_2(col1, col2): # de asemenea compara doua coloane,
+                                     # diferenta fiind ca valorile de comparare sunt numere
     ord1 = int(col1[-1])
     ord2 = int(col2[-1])
     if ord1 < ord2:
@@ -170,7 +163,11 @@ def __compara_coloane_2(col1, col2):
     else:
         return 1
 
+# functie dedicata sortarii cheii
+# lit1 si lit2 sunt litere indexate,
+# adica tupluri cu continut (litera, index)
 def __compara_litere(lit1, lit2):
+
     ord1 = ord(lit1[0])
     ord2 = ord(lit2[0])
     if ord1 < ord2:

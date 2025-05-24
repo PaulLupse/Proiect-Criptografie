@@ -207,7 +207,6 @@ def sha_256(mesaj):
             B = A
             A = (__sum_mod((temp1, temp2), MOD))
 
-            #print(i, hex(A), hex(B), hex(C), hex(D), hex(E), hex(F), hex(G), hex(H))
 
         h1 = (__sum_mod((h1, A), MOD))
         h2 = (__sum_mod((h2, B), MOD))

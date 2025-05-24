@@ -392,11 +392,113 @@ def _hashing(input_text, optiuni):
 
     return None
 
+def enigma_validation_cypher_plain(message):
+
+    valid_chars = [" "]
+
+    for LOWER_letter in range(97, 123):
+        valid_chars.append(chr(LOWER_letter))
+
+    for UPPER_letter in range(65, 91):
+        valid_chars.append(chr(UPPER_letter))
+
+    for letter in message:
+        if letter not in valid_chars:
+            return f"Eroare, mesajul tău conține caractere invalide: {letter}"
+
+    return None
+
+def check_whitespaces(space):
+
+    counter = 0
+    used_chars = []
+    white_space_count = 0
+
+    for i in range(len(space)):
+        if space[i] in used_chars:
+            return f"Eroare, \"{space[i]}\" nu are voie să se repete."
+
+        if space[i] != " ":
+            counter += 1
+            used_chars.append(space[i])
+            white_space_count = 0
+        else:
+            if counter == 1:
+                return f"Eroare, caracterul \"{space[i - 1]}\" nu are pereche."
+
+            counter = 0
+            white_space_count += 1
+
+        if white_space_count == 2 or counter == 3:
+            return f"Eroare, \"{space[i]}\" nu respecta cerintele de formatare"
+
+    if counter == 1:
+        return f"Eroare, \'{space[-1]}\' nu are pereche"
+
+    return None
+
+def plugboard_validation(key):
+
+    rez = check_whitespaces(key)
+    if rez:
+        return rez, 1
+
+    return None
+
+def from_array2dict(arr):
+
+    enigma_dict = {}
+
+    groups = [group for group in arr.split(" ")]
+
+    for i in range(len(groups)):
+        enigma_dict.update({groups[i][0]: groups[i][1]})
+
+    return enigma_dict
+
+def _valideaza_enigma(input_text, optiuni):
+
+    operatie = optiuni['operatie']
+    reflector = optiuni['reflector']
+    rotor1 = optiuni['rotor1']
+    rotor2 = optiuni['rotor2']
+    rotor3 = optiuni['rotor3']
+    tablou = optiuni['tablou']
+
+    if 'spec_rotor' in optiuni:
+        spec_rotor = optiuni['spec_rotor']
+    else: spec_rotor = None
+
+    model = optiuni['model'] # 1, 3 sau 4
+
+    if model not in ('1', '3', '4'):
+        raise ValueError('Modelul poate fii 1, (m)3 sau (m)4 (shark)')
+
+    rez = plugboard_validation(tablou)
+    if rez:
+        return rez, 1
+
+    tablou = from_array2dict(tablou)  # tablou devine dictionar,
+        # fiecare pereche de litere devine o pereche cheie:valoare,
+        # unde cheia e prima litera, iar valoarea e a doua litera
+
+    rez = enigma_validation_cypher_plain(input_text)
+    if rez:
+        return rez, 1
+
+    if model == '1':
+        return Enigma.enigma1(input_text, reflector, rotor1, rotor2, rotor3, tablou)
+    elif model == '3':
+        return Enigma.enigma3(input_text, reflector, rotor1, rotor2, rotor3, tablou)
+    else:
+        return Enigma.enigma4(input_text, reflector, spec_rotor, rotor1, rotor2, rotor3, tablou)
+
+
 def main_validator(nume_algoritm, text_intrare, optiuni):
 
     dictionar_validatori = {'cezar':_valideaza_cezar, 'vigenere':_valideaza_vigenere, 'polybius':_valideaza_polybius,
                             'adfgvx':_valideaza_adfgvx, 'bifid':_valideaza_bifid, 'playfair':_valideaza_playfair,
-                            'hill':_valideaza_hill, 'rc4':_valideaza_rc4,'aes':_valideaza_aes}
+                            'hill':_valideaza_hill, 'rc4':_valideaza_rc4,'aes':_valideaza_aes, 'enigma':_valideaza_enigma}
 
     # verificari preliminatorii
 
@@ -411,9 +513,18 @@ def main_validator(nume_algoritm, text_intrare, optiuni):
 
     return dictionar_validatori[nume_algoritm](text_intrare, optiuni)
 
-eptiuni = {'cheie':'lwerft4eol'.lower().replace(' ', ''), 'operatie':'decsefdrygsefdgriptare'}
+eptiuni = {'mesaj':'aaaaa',
+           'reflector':'b',
+                'spec_rotor':{'rotor':'beta', 'offset':1, 'inel':1},
+                'rotor1':{'rotor':6, 'offset':10, 'inel':21},
+                'rotor2':{'rotor':7, 'offset':15, 'inel':11},
+                'rotor3':{'rotor':8, 'offset':20, 'inel':6},
+                'tablou':'bq cr di ej kw mt os px uz gh',
+           'model':'4',
+           'operatie':'criptare'
+           }
 if __name__ == '__main__':
-    a = main_validator('rc4', '02b446se5rtdfgbdrt2e13f69e71eb40fa', eptiuni)
+    a = main_validator('enigma', 'wfypm', eptiuni)
     print(a)
 
 
