@@ -3,8 +3,7 @@ import tkinter.ttk as ttk
 import tkinter.messagebox as msgbox
 from tkinter.constants import DISABLED, NORMAL
 import string
-
-
+from ..Conector import Validator
 try:
     import CustomWidgets as Cw
 except:
@@ -64,7 +63,7 @@ def generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entr
             col_labels = tk.Label(settings_frame, text = str(col))
             col_labels.grid(row = 1, column = col + 2, padx = 5)
 
-        playfair_entry = []
+        hill_entry = []
         for row in range(size):
             if row == size - 1:
                 padding_value = (0, 20)
@@ -75,8 +74,8 @@ def generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entr
                 entry.grid(row = row + 2, column = col + 2, pady = padding_value)
                 entry.bind("<KeyRelease>", limit_one_char)
                 entry.bind("<FocusOut>", limit_one_char)
-                playfair_entry.append(entry)
-        entry_vals["matrix_entry"] = playfair_entry
+                hill_entry.append(entry)
+        entry_vals["matrix_entry"] = hill_entry
 
     elif combobox.get() == "ADFGVX":
 
@@ -328,6 +327,18 @@ def generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals)
         plugboard_entry.insert(0, "bq cr di ej kw mt os px uz gh")
         plugboard_entry.grid(row = 7, column = 0, columnspan = 10, pady=(0,10))
 
+        entry_vals["reflector"] = reflector_combobox
+        entry_vals["rotor1"] = rotor1_combobox
+        entry_vals["rotor2"] = rotor2_combobox
+        entry_vals["rotor3"] = rotor3_combobox
+        entry_vals["position1"] = position1_entry
+        entry_vals["position2"] = position2_entry
+        entry_vals["position3"] = position3_entry
+        entry_vals["ring1"] = ring1_entry
+        entry_vals["ring2"] = ring2_entry
+        entry_vals["ring3"] = ring3_entry
+        entry_vals["plugboard"] = plugboard_entry
+
     elif selected_version == "Enigma M3":
 
         reflector_label = tk.Label(settings_frame, text="Reflector: ")
@@ -438,6 +449,18 @@ def generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals)
         plugboard_entry = tk.Entry(enigma_settings_frame, width=30, justify="center")
         plugboard_entry.insert(0, "bq cr di ej kw mt os px uz gh")
         plugboard_entry.grid(row=7, column=0, columnspan=10, pady=(0, 10))
+
+        entry_vals["reflector"] = reflector_combobox
+        entry_vals["rotor1"] = rotor1_combobox
+        entry_vals["rotor2"] = rotor2_combobox
+        entry_vals["rotor3"] = rotor3_combobox
+        entry_vals["position1"] = position1_entry
+        entry_vals["position2"] = position2_entry
+        entry_vals["position3"] = position3_entry
+        entry_vals["ring1"] = ring1_entry
+        entry_vals["ring2"] = ring2_entry
+        entry_vals["ring3"] = ring3_entry
+        entry_vals["plugboard"] = plugboard_entry
 
     if selected_version == 'Enigma M4 "Shark"':
 
@@ -580,6 +603,19 @@ def generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals)
         plugboard_entry.insert(0, "bq cr di ej kw mt os px uz gh")
         plugboard_entry.grid(row=9, column=0, columnspan=10, pady=(0, 10))
 
+        entry_vals["reflector"] = reflector_combobox
+        entry_vals["rotor1"] = rotor1_combobox
+        entry_vals["rotor2"] = rotor2_combobox
+        entry_vals["rotor3"] = rotor3_combobox
+        entry_vals["rotor4"] = rotor4_combobox
+        entry_vals["position1"] = position1_entry
+        entry_vals["position2"] = position2_entry
+        entry_vals["position3"] = position3_entry
+        entry_vals["ring1"] = ring1_entry
+        entry_vals["ring2"] = ring2_entry
+        entry_vals["ring3"] = ring3_entry
+        entry_vals["plugboard"] = plugboard_entry
+
 
 def update_settings(combobox, settings_frame, entry_vals):
 
@@ -661,10 +697,6 @@ def update_settings(combobox, settings_frame, entry_vals):
         sha1_radiobutton.grid(row = 1, column = 1, sticky = "w")
         sha256_radiobutton = ttk.Radiobutton(settings_frame, text = "SHA-256", variable = hashing_choice, value = "SHA-256")
         sha256_radiobutton.grid(row = 2, column = 1, sticky = "w")
-        sha512_radiobutton = ttk.Radiobutton(settings_frame, text = "SHA-512", variable = hashing_choice, value = "SHA-512")
-        sha512_radiobutton.grid(row=3, column=1, sticky="w")
-        md5_radiobutton = ttk.Radiobutton(settings_frame, text = "MD5", variable = hashing_choice, value = "MD5")
-        md5_radiobutton.grid(row=4, column=1, sticky="w")
 
         entry_vals["hashing_choice"] = hashing_choice
 
@@ -680,8 +712,8 @@ def update_settings(combobox, settings_frame, entry_vals):
         aes_key_combobox.grid(row=2, column=0, columnspan=5)
         aes_textbox = Cw.LabeledTextbox(settings_frame, "Cheie de criptare:", "n", 3, 15, 3, 0, 1, 1)
         entry_vals["aes_combobox"] = aes_combobox
-        entry_vals["aes_textbox"] = aes_textbox
         entry_vals["aes_key"] = aes_key_combobox
+        entry_vals["aes_textbox"] = aes_textbox
 
     elif selected_algorithm == "RC4":
 
@@ -691,7 +723,7 @@ def update_settings(combobox, settings_frame, entry_vals):
     elif selected_algorithm == "Playfair Cipher":
 
         playfair_textbox = Cw.LabeledTextbox(settings_frame, "Cheie de criptare:", "n", 3, 15, 0, 0, 1, 1)
-        entry_vals["rc4_playfair"] = playfair_textbox
+        entry_vals["playfair_textbox"] = playfair_textbox
 
     elif selected_algorithm == "Hill Cipher":
 
@@ -719,26 +751,6 @@ def update_settings(combobox, settings_frame, entry_vals):
 
         generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals)
 
-def verify_text(text):
-
-    for char in text:
-        if not (char.isalpha() or char.isspace()):
-            return False
-    return True
-
-def verify_entry_caesar(val):
-
-    if val < -100 or val > 100:
-        return False
-    return True
-
-def verify_textbox_vigenere(text):
-
-    for char in text:
-        if not char.isalpha():
-            return False
-    return True
-
 def polybius_bifid_adfgvx_alphabet(entry_vals):
 
     alphabet = ""
@@ -750,206 +762,151 @@ def polybius_bifid_adfgvx_alphabet(entry_vals):
             alphabet += value
     return alphabet
 
-def verify_duplicate_values(entry_vals):
-
-    duplicate_values = set()
-
-    for entry in entry_vals["matrix_entry"]:
-        value = entry.get()
-        if value in duplicate_values:
-            return "Matricea conține caractere duplicate!"
-        duplicate_values.add(value)
-
-def undefined_characters(input_text, alphabet):
-
-    input_text = input_text.lower()
-    alphabet = alphabet.lower()
-    undefined_chars = set()
-    special_cases = ["i", "j"]
-
-    for char_text in input_text:
-        if char_text in special_cases:
-            if "i" not in alphabet and "j" not in alphabet:
-                undefined_chars.add("i/j")
-        elif char_text != " "and char_text not in alphabet:
-                undefined_chars.add(char_text)
-    if undefined_chars:
-        return f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}"
-    else:
-        return None
-
-def verify_polybius_decrypt(input_text, entry_vals):
-
-    size_combobox = entry_vals["size_combobox"].get()
-    digits_text = input_text.replace(" ", "")
-
-    for char in input_text:
-        if not(char.isdigit() or char.isspace()):
-            return "Mesajul trebuie să conțină doar cifre și spații!"
-
-    if len(digits_text) % 2 != 0:
-        return "Mesajul trebuie să conțină un număr par de cifre!"
-
-    if size_combobox == "5x5":
-        for digit in digits_text:
-            if int(digit) < 0 or int(digit) > 4:
-                return "Cifrele trebuie să fie cuprinse între 0 și 4!"
-
-    if size_combobox == "6x6":
-        for digit in digits_text:
-            if int(digit) < 0 or int(digit) > 5:
-                return "Cifrele trebuie să fie cuprinse între 0 și 5!"
-
-    if size_combobox == "7x7":
-        for digit in digits_text:
-            if int(digit) < 0 or int(digit) > 6:
-                return "Cifrele trebuie să fie cuprinse între 0 și 6!"
-
-def verify_adfgvx_crypt(input_text, alphabet, key):
-
-    ok = False
-    for char in alphabet:
-        if char == " ":
-            ok = True
-
-    if ok:
-        if len(input_text) < len(key) // 2:
-            return "Lungimea mesajului (cu spații) trebuie să fie cel puțin jumătate din lungimea cheii!"
-    else:
-        input_text = input_text.replace(" ","")
-        if len(input_text) < len(key) // 2:
-            return "Lungimea mesajului (fără spații) trebuie să fie cel puțin jumătate din lungimea cheii!"
-
-def verify_adfgvx_decrypt(input_text, key):
-
-    adfgvx_decrypt_list = ["a", "d", "f", "g", "v", "x", "z", " "]
-    for char in input_text:
-        if char not in adfgvx_decrypt_list:
-            return "Mesajul poate fi format doar din {'A', 'D', 'F', 'G', 'V', 'X', 'Z'} și spații!"
-
-    input_text_words = input_text.split()
-    if len(input_text_words) != len(key):
-        return "Numărul de cuvinte din mesaj trebuie să fie egal cu lungimea cheii!"
-
 def crypt(textbox1, textbox2, combobox, entry_vals):
 
     selected_algorithm = combobox.get()
     input_text = textbox1.get("1.0", "end-1c")
     cleaned_text = input_text.replace("\n", " ")
     cleaned_text = cleaned_text.replace("\t", " ")
+    cleaned_text = cleaned_text.strip()
     textbox2.config(state = NORMAL)
     if selected_algorithm == "Alege algoritmul":
         msgbox.showerror("Eroare", "Selectează un algoritm de criptare!")
 
     elif selected_algorithm == "Caesar Cipher":
-        try:
-            shift_value = int(entry_vals["caesar_entry"].get())
-        except ValueError:
-            msgbox.showerror("Eroare", "Cheia trebuie să fie un număr întreg!")
-            return
-        if not verify_text(cleaned_text):
-            msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
-            return
-        if not verify_entry_caesar(shift_value):
-            msgbox.showerror("Eroare","Cheia trebuie să fie cuprinsă între -100 și 100!")
-            return
 
-        textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Basic.cezar(cleaned_text, shift_value, 'criptare'))
-        textbox2.config(state = DISABLED)
+        shift_value = entry_vals["caesar_entry"].get()
+        options = {"cheie": shift_value, "operatie": "criptare"}
+        message, code = Validator.main_validator("cezar", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
+            return
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Vigenère Cipher":
+
         key_value = entry_vals["vigenere_textbox"].get("1.0", "end-1c")
-        if not verify_textbox_vigenere(key_value):
-            msgbox.showerror("Eroare", "Cheia trebuie să conțină doar litere mari sau mici! (fără spații)")
+        options = {"cheie": key_value, "operatie": "criptare"}
+        message, code = Validator.main_validator("vigenere", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
             return
-        if not verify_text(cleaned_text):
-            msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
-            return
-        textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Basic.vignere(cleaned_text, key_value, 'criptare'))
-        textbox2.config(state = DISABLED)
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
 
     elif selected_algorithm == "Polybius":
+
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
-        error = verify_duplicate_values(entry_vals)
-        if error:
-            msgbox.showerror("Eroare", error)
+        size_combobox = entry_vals["size_combobox"].get()
+        options = {"alfabet": alphabet, "marime_matrice": size_combobox, "operatie": "criptare"}
+        message, code = Validator.main_validator("polybius", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
             return
-        error = undefined_characters(cleaned_text, alphabet)
-        if error:
-            msgbox.showerror("Eroare", error)
-            return
-        textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Polybius.polybius(mesaj = cleaned_text, alfabet = alphabet, operatie = 'criptare'))
-        textbox2.config(state = DISABLED)
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
 
     elif selected_algorithm == "Bifid Cipher":
 
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
-        error = verify_duplicate_values(entry_vals)
-        if error:
-            msgbox.showerror("Eroare", error)
+        size_combobox = entry_vals["size_combobox"].get()
+        options = {"alfabet": alphabet, "marime_matrice": size_combobox, "operatie": "criptare"}
+        message, code = Validator.main_validator("bifid", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
             return
-        error = undefined_characters(cleaned_text, alphabet)
-        if error:
-            msgbox.showerror("Eroare", error)
-            return
-        textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Polybius.bifid(cleaned_text, alphabet, 'criptare'))
-        textbox2.config(state = DISABLED)
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
 
     elif selected_algorithm == "ADFGVX":
+
         key = entry_vals["adfgvx_textbox"].get("1.0", "end-1c")
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
-        error = verify_duplicate_values(entry_vals)
-        if error:
-            msgbox.showerror("Eroare", error)
+        size_combobox = entry_vals["size_combobox"].get()
+        options = {"alfabet": alphabet, "cheie": key, "marime_matrice": size_combobox, "operatie": "criptare"}
+        message, code = Validator.main_validator("adfgvx", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
             return
-        error = undefined_characters(cleaned_text, alphabet)
-        if error:
-            msgbox.showerror("Eroare", error)
-            return
-        error = verify_adfgvx_crypt(cleaned_text, alphabet, key)
-        if error:
-            msgbox.showerror("Eroare", error)
-            return
-        textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Polybius.adfgvx(cleaned_text, alphabet, key, "criptare"))
-        textbox2.config(state = DISABLED)
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state = DISABLED)
 
     elif selected_algorithm == "Hashing":
 
         choice = entry_vals["hashing_choice"].get()
-
-        if choice == "SHA-1":
-
-            textbox2.delete("1.0", "end-1c")
-            textbox2.insert("end-1c", Hashing.sha_1(input_text))
-            textbox2.config(state = DISABLED)
-
-        if choice == "SHA-256":
-
-            textbox2.delete("1.0", "end-1c")
-            textbox2.insert("end-1c", Hashing.sha_256(input_text))
-            textbox2.config(state = DISABLED)
-
-        if choice == "SHA-512":
-
-            textbox2.delete("1.0", "end-1c")
-            textbox2.insert("end-1c", "SHA-512")
-            textbox2.config(state = DISABLED)
-
-        if choice == "MD5":
-
-            textbox2.delete("1.0", "end-1c")
-            textbox2.insert("end-1c", "MD5")
-            textbox2.config(state = DISABLED)
+        options = {"varianta" : choice, "operatie": "criptare"}
+        message = Validator.main_validator("hashing", cleaned_text, options)
+        textbox2.delete("1.0", "end-1c")
+        textbox2.insert("end-1c", message)
+        textbox2.config(state=DISABLED)
 
     elif selected_algorithm == "AES":
-        ...
+
+        aes_type = entry_vals["aes_combobox"].get()
+        key_format = entry_vals["aes_key"].get()
+        key = entry_vals["aes_textbox"].get("1.0", tk.END).strip()
+        options = {"tip": aes_type, "format_cheie": key_format, "cheie": key, "operatie":"criptare"}
+        message, code = Validator.main_validator("aes", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
+            return
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
 
     elif selected_algorithm == "RC4":
+
+        key = entry_vals["rc4_textbox"].get("1.0", tk.END).strip()
+        options = {"cheie": key, "operatie": "criptare"}
+        message, code = Validator.main_validator("rc4", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
+            return
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
+
+    elif selected_algorithm == "Playfair Cipher":
+
+        key = entry_vals["playfair_textbox"].get("1.0", tk.END).strip()
+        options = {"cheie": key, "operatie": "criptare"}
+        message, code = Validator.main_validator("playfair", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
+            return
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
+
+    elif selected_algorithm == "Hill Cipher":
+
+        alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
+        options = {"cheie": alphabet, "operatie": "criptare"}
+        message, code = Validator.main_validator("hill", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
+            return
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
+
+    elif selected_algorithm == "Enigma":
+
         ...
 
 def decrypt(textbox1, textbox2, combobox, entry_vals):
@@ -958,6 +915,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
     input_text = textbox1.get("1.0", "end-1c")
     cleaned_text = input_text.replace("\n", " ")
     cleaned_text = cleaned_text.replace("\t", " ")
+    cleaned_text = cleaned_text.strip()
     textbox2.config(state = NORMAL)
 
     if selected_algorithm == "Alege algoritmul":
@@ -965,74 +923,72 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
 
     elif selected_algorithm == "Caesar Cipher":
 
-        try:
-            shift_value = int(entry_vals["caesar_entry"].get())
-        except ValueError:
-            msgbox.showerror("Eroare", "Cheia trebuie să fie un număr întreg!")
+        shift_value = entry_vals["caesar_entry"].get()
+        options = {"cheie": shift_value, "operatie": "decriptare"}
+        message, code = Validator.main_validator("cezar", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
             return
-        if not verify_text(cleaned_text):
-            msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
-            return
-        if not verify_entry_caesar(shift_value):
-            msgbox.showerror("Eroare","Cheia trebuie să fie cuprinsă între -100 și 100!")
-            return
-        textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Basic.cezar(cleaned_text, shift_value, 'decriptare'))
-        textbox2.config(state = DISABLED)
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
 
     elif selected_algorithm == "Vigenère Cipher":
 
         key_value = entry_vals["vigenere_textbox"].get("1.0", "end-1c")
-        if not verify_textbox_vigenere(key_value):
-            msgbox.showerror("Eroare", "Cheia trebuie să conțină doar litere mari sau mici! (fără spații)")
+        options = {"cheie": key_value, "operatie": "decriptare"}
+        message, code = Validator.main_validator("vigenere", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
             return
-        if not verify_text(cleaned_text):
-            msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
-            return
-        textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Basic.vignere(cleaned_text, key_value, 'decriptare'))
-        textbox2.config(state = DISABLED)
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
 
     elif selected_algorithm == "Polybius":
 
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
-        error = verify_duplicate_values(entry_vals)
-        if error:
-            msgbox.showerror("Eroare", error)
+        size_combobox = entry_vals["size_combobox"].get()
+        options = {"alfabet": alphabet, "marime_matrice": size_combobox, "operatie": "decriptare"}
+        message, code = Validator.main_validator("polybius", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
             return
-        error = verify_polybius_decrypt(cleaned_text, entry_vals)
-        if error:
-            msgbox.showerror("Eroare", error)
-            return
-        textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Polybius.polybius(mesaj = cleaned_text, alfabet = alphabet, operatie = 'decriptare'))
-        textbox2.config(state = DISABLED)
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
 
     elif selected_algorithm == "Bifid Cipher":
 
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
-        error = verify_duplicate_values(entry_vals)
-        if error:
-            msgbox.showerror("Eroare", error)
+        size_combobox = entry_vals["size_combobox"].get()
+        options = {"alfabet": alphabet, "marime_matrice": size_combobox, "operatie": "decriptare"}
+        message, code = Validator.main_validator("bifid", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
             return
-        textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Polybius.bifid(cleaned_text, alphabet, 'decriptare'))
-        textbox2.config(state = DISABLED)
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
 
     elif selected_algorithm == "ADFGVX":
+
         key = entry_vals["adfgvx_textbox"].get("1.0", "end-1c")
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
-        error = verify_duplicate_values(entry_vals)
-        if error:
-            msgbox.showerror("Eroare", error)
+        size_combobox = entry_vals["size_combobox"].get()
+        options = {"alfabet": alphabet, "cheie": key, "marime_matrice": size_combobox, "operatie": "decriptare"}
+        message, code = Validator.main_validator("adfgvx", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
             return
-        error = verify_adfgvx_decrypt(cleaned_text, key)
-        if error:
-            msgbox.showerror("Eroare", error)
-            return
-        textbox2.delete("1.0", "end-1c")
-        textbox2.insert("end-1c", Polybius.adfgvx(cleaned_text, alphabet, key, "decriptare"))
-        textbox2.config(state = DISABLED)
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
 
     elif selected_algorithm == "Hashing":
 
@@ -1040,9 +996,61 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
         return
 
     elif selected_algorithm == "AES":
-        ...
+
+        aes_type = entry_vals["aes_combobox"].get()
+        key_format = entry_vals["aes_key"].get()
+        key = entry_vals["aes_textbox"].get("1.0", tk.END).strip()
+        options = {"tip": aes_type, "format_cheie": key_format, "cheie": key, "operatie": "decriptare"}
+        message, code = Validator.main_validator("aes", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
+            return
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
 
     elif selected_algorithm == "RC4":
+
+        key = entry_vals["rc4_textbox"].get("1.0", tk.END).strip()
+        options = {"cheie": key, "operatie": "decriptare"}
+        message, code = Validator.main_validator("rc4", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
+            return
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
+
+    elif selected_algorithm == "Playfair Cipher":
+
+        key = entry_vals["playfair_textbox"].get("1.0", tk.END).strip()
+        options = {"cheie": key, "operatie": "decriptare"}
+        message, code = Validator.main_validator("playfair", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
+            return
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
+
+    elif selected_algorithm == "Hill Cipher":
+
+        alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
+        options = {"cheie": alphabet, "operatie": "decriptare"}
+        message, code = Validator.main_validator("hill", cleaned_text, options)
+        if code == 1:
+            msgbox.showerror("Eroare", message)
+            return
+        else:
+            textbox2.delete("1.0", "end-1c")
+            textbox2.insert("end-1c", message)
+            textbox2.config(state=DISABLED)
+
+    elif selected_algorithm == "Enigma":
+
         ...
 
 def brute_force_caesar(textbox1, textbox2):
@@ -1051,15 +1059,17 @@ def brute_force_caesar(textbox1, textbox2):
     cleaned_text = input_text.replace("\n", " ")
     cleaned_text = cleaned_text.replace("\t", " ")
     textbox2.config(state = NORMAL)
-
-    if not verify_text(cleaned_text):
-        msgbox.showerror("Eroare", "Mesajul trebuie să conțină doar litere mari sau mici!")
+    options = {"cheie": 1, "operatie": "decriptare"}
+    message, code = Validator.main_validator("cezar", cleaned_text, options)
+    if code == 1:
+        msgbox.showerror("Eroare", message)
         return
-    string_list = Basic.cezar(cleaned_text, None, 'spargere')
-    textbox2.delete("1.0", "end-1c")
-    for i, strings in enumerate(string_list, start=1):
-        textbox2.insert("end", f"{i}. {strings}\n")
-    textbox2.config(state = DISABLED)
+    else:
+        string_list = Basic.cezar(cleaned_text, None, 'spargere')
+        textbox2.delete("1.0", "end-1c")
+        for i, strings in enumerate(string_list, start=1):
+            textbox2.insert("end", f"{i}. {strings}\n")
+        textbox2.config(state = DISABLED)
 
 
 def main():
