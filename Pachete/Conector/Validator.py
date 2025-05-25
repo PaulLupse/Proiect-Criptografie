@@ -24,18 +24,18 @@ def _verify_duplicate_values(entry_vals):
 
     return None
 
-def _undefined_characters(input_text, alphabet):
+def _undefined_characters(input_text, alfabet):
 
     input_text = input_text.lower()
-    alphabet = alphabet.lower()
+    alfabet = alfabet.lower()
     undefined_chars = set()
     special_cases = ["i", "j"]
 
     for char_text in input_text:
         if char_text in special_cases:
-            if "i" not in alphabet and "j" not in alphabet:
+            if "i" not in alfabet and "j" not in alfabet:
                 undefined_chars.add("i/j")
-        elif char_text != " "and char_text not in alphabet:
+        elif char_text != " "and char_text not in alfabet:
                 undefined_chars.add(char_text)
     if undefined_chars:
         return f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}"
@@ -75,14 +75,14 @@ def _validate_vigenere(input_text, options):
 
 def _validate_polybius(input_text, options):
 
-    alphabet = options['alphabet']
+    alfabet = options['alfabet']
 
     dup_vals = _verify_duplicate_values(options)
     if dup_vals:
         return dup_vals, 1
 
     if options['operatie'] == 'criptare':
-        undef_chars = _undefined_characters(input_text, alphabet)
+        undef_chars = _undefined_characters(input_text, alfabet)
         if undef_chars:
             return undef_chars, 1
 
@@ -112,30 +112,34 @@ def _validate_polybius(input_text, options):
                 if int(digit) < 0 or int(digit) > 6:
                     return "Cifrele trebuie să fie cuprinse între 0 și 6!", 1
 
-    return Polybius.polybius(input_text, alphabet, options['operatie']), 0
+    return Polybius.polybius(input_text, alfabet, options['operatie']), 0
 
 def _validate_bifid(input_text, options):
 
-    alphabet = options['alphabet']
+    alfabet = options['alfabet']
 
     dup_vals = _verify_duplicate_values(options)
     if dup_vals:
         return dup_vals, 1
 
-    undef_chars = _undefined_characters(input_text, alphabet)
+    undef_chars = _undefined_characters(input_text, alfabet)
     if undef_chars:
        return undef_chars, 1
 
-    return Polybius.bifid(input_text, alphabet, options['operatie']), 0
+    return Polybius.bifid(input_text, alfabet, options['operatie']), 0
 
 def _validate_adfgvx(input_text, options):
 
-    alphabet = options['alphabet']
+    alfabet = options['alfabet']
     key = options['cheie']
+
+    dup_vals = _verify_duplicate_values(options)
+    if dup_vals:
+        return dup_vals, 1
 
     if options['operatie'] == 'criptare':
         ok = False
-        for char in alphabet:
+        for char in alfabet:
             if char == " ":
                 ok = True
 
@@ -157,7 +161,7 @@ def _validate_adfgvx(input_text, options):
         if len(input_text_words) != len(key):
             return "Numărul de cuvinte din mesaj trebuie să fie egal cu lungimea cheii!", 1
 
-    return Polybius.adfgvx(input_text, alphabet, key, options['operatie']), 0
+    return Polybius.adfgvx(input_text, alfabet, key, options['operatie']), 0
 
 def _playfair_validation_plain(message):
 
