@@ -1,6 +1,8 @@
 import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 
-MOD = 2**32
+MOD = 2**32 - 1
 
 constante_sha256 = ('428a2f98', '71374491', 'b5c0fbcf', 'e9b5dba5', '3956c25b', '59f111f1', '923f82a4', 'ab1c5ed5',
 'd807aa98', '12835b01', '243185be', '550c7dc3', '72be5d74', '80deb1fe', '9bdc06a7', 'c19bf174',

@@ -1,5 +1,7 @@
 import numpy as np
 from BitVector import BitVector as Bv
+import warnings
+warnings.filterwarnings('ignore')
 
 # functie ce efectueaza o rotatie circulara spre stanga
 # a bitilor unui numar intreg, pe 32 de biti
