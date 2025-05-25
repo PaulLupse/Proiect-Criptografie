@@ -368,7 +368,7 @@ def _key_validation_aes(key, expected_length, format):
 
     valid_chars = []
 
-    if format == 'hex':
+    if format == 'hexazecimal':
         for LOWER_letter in range(97, 103):
             valid_chars.append(chr(LOWER_letter))
 
@@ -379,7 +379,7 @@ def _key_validation_aes(key, expected_length, format):
             if key[i] not in valid_chars:
                 return f"Eroare: mesajul tău conține caractere invalide:{key[i]}"
 
-    if format == 'hex':
+    if format == 'hexazecimal':
         expected_length *= 2
 
     key_len = len(key)
@@ -539,8 +539,8 @@ if __name__ == '__main__':
 
     options = {
                'tip':'AES-128',
-               'format_cheie':'string',
-               'cheie':'1234567812345678',
+               'format_cheie':'hexazecimal',
+               'cheie':'12345678123456781234567812345678',
                'operatie': 'criptare'
                }
 
