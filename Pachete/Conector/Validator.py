@@ -159,16 +159,20 @@ def _validate_adfgvx(input_text, options):
             input_text = input_text.replace(" ", "")
             if len(input_text) < len(key) // 2:
                 return "Lungimea mesajului (fără spații) trebuie să fie cel puțin jumătate din lungimea cheii!", 1
+
+        rez = _undefined_characters(input_text, alfabet)
+        if rez:
+            return rez, 1
     else:
 
         adfgvx_decrypt_list = ["a", "d", "f", "g", "v", "x", "z", " "]
         for char in input_text:
             if char not in adfgvx_decrypt_list:
-                return "Mesajul poate fi format doar din {'A', 'D', 'F', 'G', 'V', 'X', 'Z'} și spații!", 1
+                return "Mesajul criptat poate fi format doar din {'A', 'D', 'F', 'G', 'V', 'X', 'Z'} și spații!", 1
 
         input_text_words = input_text.split()
         if len(input_text_words) != len(key):
-            return "Numărul de cuvinte din mesaj trebuie să fie egal cu lungimea cheii!", 1
+            return "Numărul de cuvinte din mesajul criptat trebuie să fie egal cu lungimea cheii!", 1
 
     return Polybius.adfgvx(input_text, alfabet, key, options['operatie']), 0
 
