@@ -1,4 +1,6 @@
+# functie care returneaza minorul unei matrice(?)
 def matrix_minor(matrix, order, row, column):
+
     result_matrix = []
     for i in range(order):
         add_row = []
@@ -14,12 +16,16 @@ def matrix_minor(matrix, order, row, column):
 
     return result_matrix
 
+# functie care returneaza determinantul de ordin 2
 def second_order_det(matrix):
+
     i = 0
     j = 0
     return (matrix[i][j] * matrix[i+1][j+1]) - (matrix[i][j+1] * matrix[i + 1][j])
 
+# functie care returneaza determinantul de ordin 3
 def third_order_det(matrix):
+
     sum_of_determinant = 0
     for i in range(1):
         for j in range(3):
@@ -29,8 +35,3 @@ def third_order_det(matrix):
             sum_of_determinant += result
     return sum_of_determinant
 
-def is_string(message):
-    if type(message) is not str:
-        return False
-    else:
-        return True

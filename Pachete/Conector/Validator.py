@@ -486,10 +486,8 @@ def _valideaza_enigma(input_text, optiuni):
     if rez:
         return rez, 1
 
-    if model == '1':
+    if model == '1' or model == '3':
         return Enigma.enigma1(input_text, reflector, rotor1, rotor2, rotor3, tablou)
-    elif model == '3':
-        return Enigma.enigma3(input_text, reflector, rotor1, rotor2, rotor3, tablou)
     else:
         return Enigma.enigma4(input_text, reflector, spec_rotor, rotor1, rotor2, rotor3, tablou)
 
@@ -513,18 +511,21 @@ def main_validator(nume_algoritm, text_intrare, optiuni):
 
     return dictionar_validatori[nume_algoritm](text_intrare, optiuni)
 
-eptiuni = {'mesaj':'aaaaa',
-           'reflector':'b',
-                'spec_rotor':{'rotor':'beta', 'offset':1, 'inel':1},
-                'rotor1':{'rotor':6, 'offset':10, 'inel':21},
-                'rotor2':{'rotor':7, 'offset':15, 'inel':11},
-                'rotor3':{'rotor':8, 'offset':20, 'inel':6},
-                'tablou':'bq cr di ej kw mt os px uz gh',
-           'model':'4',
-           'operatie':'criptare'
-           }
 if __name__ == '__main__':
-    a = main_validator('enigma', 'wfypm', eptiuni)
+
+    # exemplu de optiune pt enigma
+    optiuni = {'mesaj': 'aaaaa',
+               'reflector': 'b',
+               'spec_rotor': {'rotor': 'beta', 'offset': 1, 'inel': 1},
+               'rotor1': {'rotor': 6, 'offset': 10, 'inel': 21},
+               'rotor2': {'rotor': 7, 'offset': 15, 'inel': 11},
+               'rotor3': {'rotor': 8, 'offset': 20, 'inel': 6},
+               'tablou': 'bq cr di ej kw mt os px uz gh',
+               'model': '4',
+               'operatie': 'criptare'
+               }
+
+    a = main_validator('enigma', 'wfypm', optiuni)
     print(a)
 
 

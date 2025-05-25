@@ -12,31 +12,40 @@ constante_sha256 = ('428a2f98', '71374491', 'b5c0fbcf', 'e9b5dba5', '3956c25b', 
 '748f82ee', '78a5636f', '84c87814', '8cc70208', '90befffa', 'a4506ceb', 'bef9a3f7', 'c67178f2',
                     )
 
+# functie ce efectueaza o rotatie circulara spre stanga
+# a bitilor unui numar intreg, pe 32 de biti
 def __st_rot(numar, nr_pos):
     bin_numar = bin(numar)[2::]
     bin_numar = '0' * (32 - len(bin_numar)) + bin_numar
     bin_numar = bin_numar[nr_pos::] + bin_numar[:nr_pos:]
     return np.uint32(int(bin_numar, 2))
 
+# functie ce efectueaza o rotatie circulara spre dreapta
+# a bitilor unui numar intreg, pe 32 de biti
 def __dr_rot(numar, nr_pos):
     bin_numar = bin(numar)[2::]
     bin_numar = '0' * (32 - len(bin_numar)) + bin_numar
     bin_numar = bin_numar[-nr_pos::] + bin_numar[:-nr_pos:]
     return np.uint32(int(bin_numar, 2))
 
+# functie care implementeaza algoritmul de hashing sha-1
 def sha_1(mesaj):
 
     bin_mesaj = ''
 
     for caracter in mesaj:
         caracter_binar = bin(ord(caracter))[2::]
-        # padding
+        # padding la caracter
         caracter_binar = '0' * (8 - len(caracter_binar)) + caracter_binar
         bin_mesaj += caracter_binar
 
     lung_bin_mesaj = len(bin_mesaj)
 
-    # padding la mesaj
+    # padding la mesaj, intrucat functia lucreaza pe blocuri de 512 biti
+    # indiferent de lungimea mesajului, ii vom atasa un padding
+    # un bit 1, urmat de un numar specific de biti 0, iar ultimii 64 de biti
+    # sunt reprezentarea in binar a lungimii mesajului initial
+    # in total, reprezentarea in binar a mesajului trebuie sa aiba un numar de biti divizibil cu 512
 
     bin_mesaj += '1'
     nr_zerouri = 512 * ((lung_bin_mesaj + 1 - 448) // 512 + 1) - (lung_bin_mesaj + 1 - 448)
@@ -61,7 +70,7 @@ def sha_1(mesaj):
     h5 = np.uint32(3285377520)
 
     for bloc in lista_blocuri:
-        global A, B, C, D, E
+        global A, B, C, D, E  # variabile ce reprezinta, mai mult sau mai putin, starea de compresie a mesajului
         A = np.uint32(h1)
         B = np.uint32(h2)
         C = np.uint32(h3)
@@ -73,11 +82,14 @@ def sha_1(mesaj):
         for i in range(0, len(bloc), 32):
             cuvinte.append(int(bloc[i:i + 32:], 2))
 
+        # se mai genereaza 64 de cuvinte si se adauga la bloc
         for i in range(16, 80):
             cuvinte.append(np.uint32(__st_rot(np.uint32(np.uint32(cuvinte[i - 3] ^ cuvinte[i - 8]) ^ cuvinte[i - 14]) ^ cuvinte[i - 16], 1)))
 
+        # compresia propriu-zisa
         for index, cuvant in enumerate(cuvinte):
 
+            # pentru fiecare cuvant dintre cele 80, realizata in functie de index-ul acestuia
             if index < 20:
                 k = 1518500249
                 f = np.uint32((B & C) | ((~B) & D))
@@ -99,14 +111,17 @@ def sha_1(mesaj):
             B = A
             A = temp
 
+        # constantele sunt schimbate
         h1 = np.uint32(h1 + A)
         h2 = np.uint32(h2 + B)
         h3 = np.uint32(h3 + C)
         h4 = np.uint32(h4 + D)
         h5 = np.uint32(h5 + E)
 
-
     return hex(h1)[2::] + hex(h2)[2::] + hex(h3)[2::] + hex(h4)[2::] + hex(h5)[2::]
+
+# urmatoare suita de functii este folosita la algoritmul sha-256
+# realizand operatii pur matematic logice asupra numerelor intregi (pe 32 biti)
 
 def __ch(x, y, z):
     return (x & y) ^ (~x & z)
@@ -126,26 +141,34 @@ def __lsigma_0(x):
 def __lsigma_1(x):
     return __dr_rot(x, 17) ^ __dr_rot(x, 19) ^ (x >> 10)
 
+# functie care insumeaza un numar indefinit de valori intregi, modulo MOD
 def __sum_mod(numere, MOD):
     if len(numere) > 2:
         return (__sum_mod(numere[:-1:], MOD) + numere[-1]) % MOD
     return (numere[0] + numere[1]) % MOD
 
+# functie care implementeaza algoritmul de hashing sha-256
 def sha_256(mesaj):
 
-    k = [int(constanta, 16) for constanta in constante_sha256]
+    # lista ce stocheaza constantele de runda
+    k = np.array([int(constanta, 16) for constanta in constante_sha256], dtype = object)
 
     bin_mesaj = ''
 
+    # convertim mesajul in format binar
     for caracter in mesaj:
         caracter_binar = bin(ord(caracter))[2::]
-        # padding
+        # padding la caracter
         caracter_binar = '0' * (8 - len(caracter_binar)) + caracter_binar
         bin_mesaj += caracter_binar
 
     lung_bin_mesaj = len(bin_mesaj)
 
-    # padding la mesaj
+    # padding la mesaj, intrucat functia lucreaza pe blocuri de 512 biti
+    # indiferent de lungimea mesajului, ii vom atasa un padding
+    # un bit 1, urmat de un numar specific de biti 0, iar ultimii 64 de biti
+    # sunt reprezentarea in binar a lungimii mesajului initial
+    # in total, reprezentarea in binar a mesajului trebuie sa aiba un numar de biti divizibil cu 512
 
     bin_mesaj += '1'
     nr_zerouri = 512 * ((lung_bin_mesaj + 1 - 448) // 512 + 1) - (lung_bin_mesaj + 1 - 448)
@@ -154,7 +177,6 @@ def sha_256(mesaj):
     bin_mesaj += '0' * nr_zerouri_lungime_mesaj + bin(lung_bin_mesaj)[2::]
 
     # se imparte scrierea binara a mesajului in 'bloc'-uri de cate 512 biti
-
     lung_bin_mesaj = len(bin_mesaj)
     lista_blocuri = []
     for i in range(0, lung_bin_mesaj, 512):
@@ -163,7 +185,7 @@ def sha_256(mesaj):
 
 
     # compresia
-    global h1, h2, h3, h4, h5, h6, h7, h8 # constantele initiale
+    global h1, h2, h3, h4, h5, h6, h7, h8 # constantele initiale, folosite pentru compresie
     h1 = 1779033703
     h2 = 3144134277
     h3 = 1013904242
@@ -174,7 +196,7 @@ def sha_256(mesaj):
     h8 = 1541459225
 
     for bloc in lista_blocuri:
-        global A, B, C, D, E, F, G, H
+        global A, B, C, D, E, F, G, H # variabile ce reprezinta, mai mult sau mai putin, starea de compresie a mesajului
         A = h1
         B = h2
         C = h3
@@ -189,12 +211,11 @@ def sha_256(mesaj):
         for i in range(0, len(bloc), 32):
             cuvinte.append((int(bloc[i:i + 32:], 2)))
 
-        # se mai construiesc 64 de cuvinte
+        # se mai construiesc 48 de cuvinte si sunt adaugate la bloc
         for i in range(16, 64):
             cuvinte.append((__sum_mod((__lsigma_1(cuvinte[i-2]), cuvinte[i-7], __lsigma_0(cuvinte[i-15]), cuvinte[i-16],), MOD)))
 
-        #print('init: ', hex(A), hex(B), hex(C), hex(D), hex(E), hex(F), hex(G), hex(H))
-
+        # compresia propriu-zisa
         for i in range(0, 64):
             temp1 = (__sum_mod((H, __sigma_1(E), __ch(E, F, G), k[i], cuvinte[i]), MOD))
             temp2 = (__sum_mod((__sigma_0(A), __maj(A, B, C)), MOD))
@@ -207,7 +228,7 @@ def sha_256(mesaj):
             B = A
             A = (__sum_mod((temp1, temp2), MOD))
 
-
+        # constantele sunt schimbate
         h1 = (__sum_mod((h1, A), MOD))
         h2 = (__sum_mod((h2, B), MOD))
         h3 = (__sum_mod((h3, C), MOD))
