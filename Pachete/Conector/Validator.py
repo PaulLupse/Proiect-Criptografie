@@ -369,9 +369,6 @@ def _key_validation_aes(key, expected_length, format):
     valid_chars = []
 
     if format == 'hex':
-        expected_length *= 2
-
-    if format == 'hex':
         for LOWER_letter in range(97, 103):
             valid_chars.append(chr(LOWER_letter))
 
@@ -396,7 +393,7 @@ def _validate_aes(input_text, options):
     operation = options['operatie']
     key = options['cheie']
     type = options['tip']
-    format_key = options['format_cheie']
+    format_key = options['format_cheie'].lower()
 
     expected_length = 16 if type == 'AES-128' else 32
 
@@ -540,19 +537,14 @@ def main_validator(algorithm_name, input_text, options):
 
 if __name__ == '__main__':
 
-    # exemplu de optiune pt enigma
-    options = {'mesaj': 'aaaaa',
-               'reflector': 'b',
-               'spec_rotor': {'rotor': 'beta', 'offset': 1, 'inel': 1},
-               'rotor1': {'rotor': 6, 'offset': 10, 'inel': 21},
-               'rotor2': {'rotor': 7, 'offset': 15, 'inel': 11},
-               'rotor3': {'rotor': 8, 'offset': 20, 'inel': 6},
-               'tablou': 'bq cr di ej kw mt os px uz gh',
-               'operationel': '4',
+    options = {
+               'tip':'AES-128',
+               'format_cheie':'string',
+               'cheie':'1234567812345678',
                'operatie': 'criptare'
                }
 
-    a = main_validator('enigma', 'wfypm', options)
+    a = main_validator('aes', 'salut', options)
     print(a)
 
 
