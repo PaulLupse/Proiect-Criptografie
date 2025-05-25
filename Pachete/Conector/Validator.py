@@ -22,7 +22,7 @@ def _verify_duplicate_values(entry_vals):
     for entry in entry_vals["alfabet"]:
 
         if entry in duplicate_values:
-            return "Matricea conține caractere duplicate!", 1
+            return "Matricea conține caractere duplicate!"
         duplicate_values.add(entry)
 
     return None
