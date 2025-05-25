@@ -189,7 +189,7 @@ def _playfair_validation_plain(message):
 
     for letter in message:
         if letter not in valid_chars:
-            return f"Eroare: mesajul tău conține caractere invalide: {letter}."
+            return f"Mesajul tău conține caractere invalide: {letter}."
 
     return message
 
@@ -203,7 +203,7 @@ def _playfair_validation_cypher(message):
 
     for letter in message:
         if letter not in valid_chars:
-            return f"Eroare: mesajul tău conține caractere invalide:{letter}."
+            return f"Mesajul tău conține caractere invalide: {letter}."
 
     return message
 
@@ -217,7 +217,7 @@ def _key_validation_playfair(key):
 
     for letter in key:
         if letter not in valid_chars:
-            return f"Eroare: mesajul tău conține caractere invalide: {letter}."
+            return f"Mesajul tău conține caractere invalide: {letter}."
 
     return None
 
@@ -237,7 +237,7 @@ def _validate_playfair(input_text, options):
 
     for letter in input_text:
         if letter not in valid_chars:
-            return f"Eroare: mesajul tău conține caractere invalide:{letter}.", 1
+            return f"Mesajul tău conține caractere invalide: {letter}.", 1
 
     rez = _key_validation_playfair(cheie)
     if rez:
@@ -324,7 +324,7 @@ def rc4_validation_cypher(message):
 
     for i in range(0, len(message)):
         if message[i] not in valid_chars:
-            return f"Eroare: mesajul tău conține caractere invalide:{message[i]}"
+            return f"Mesajul tău conține caractere invalide: {message[i]}"
 
     return None
 
@@ -345,7 +345,7 @@ def _validate_rc4(input_text, options):
 def _aes128_validation_cypher(message):
 
     if len(message.replace(" ", "")) % 2 != 0:
-        return f"Eroare: mesajul este de lungime invalidă."
+        return f"Mesajul este de lungime invalidă."
 
     valid_chars = [' ']
 
@@ -357,7 +357,7 @@ def _aes128_validation_cypher(message):
 
     for i in range(0, len(message)):
         if message[i] not in valid_chars:
-            return f"Eroare: mesajul tău conține caractere invalide:{message[i]}."
+            return f"Mesajul tău conține caractere invalide: {message[i]}."
         else:
             pass
 
@@ -377,7 +377,7 @@ def _key_validation_aes(key, expected_length, format):
 
         for i in range(0, len(key)):
             if key[i] not in valid_chars:
-                return f"Eroare: mesajul tău conține caractere invalide:{key[i]}"
+                return f"Mesajul tău conține caractere invalide: {key[i]}"
 
     if format == 'hexazecimal':
         expected_length *= 2
@@ -445,7 +445,7 @@ def _plugboard_validation(key):
 
     for i in range(len(key)):
         if key[i] in used_chars:
-            return f"Eroare, \"{key[i]}\" nu are voie să se repete."
+            return f"Caracterul: \"{key[i]}\" nu are voie să se repete."
 
         if key[i] != " ":
             counter += 1
@@ -453,16 +453,16 @@ def _plugboard_validation(key):
             white_space_count = 0
         else:
             if counter == 1:
-                return f"Eroare, caracterul \"{key[i - 1]}\" nu are pereche."
+                return f"Caracterul \"{key[i - 1]}\" nu are pereche."
 
             counter = 0
             white_space_count += 1
 
         if white_space_count == 2 or counter == 3:
-            return f"Eroare, \"{key[i]}\" nu respecta cerintele de formatare"
+            return f"Tabloul comutator nu respecta cerintele de formatare"
 
     if counter == 1:
-        return f"Eroare, \'{key[-1]}\' nu are pereche"
+        return f"\'{key[-1]}\' nu are pereche"
 
     return None
 
