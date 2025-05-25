@@ -2,7 +2,10 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as msgbox
 from tkinter.constants import DISABLED, NORMAL
+import ttkthemes
 import string
+
+
 try:
     import CustomWidgets as Cw
 except:
@@ -1065,10 +1068,7 @@ def main():
     root = tk.Tk()
     root.resizable(False,False)
     root.title("Algoritmi de Criptare")
-    try:
-        root.iconbitmap("imagine-lacat.ico")
-    except:
-        print("Nush")
+
     entry_vals = {}
     textbox1 = Cw.LabeledTextbox(root, "Text:", "n", 10, 20,0,0,20,1)
     entry_vals["textbox1"] = textbox1

@@ -44,17 +44,21 @@ def _undefined_characters(input_text, alphabet):
 
 def _valideaza_cezar(input_text, optiuni):
 
+    cheie = None
+    try:
+        cheie = int(optiuni['cheie'])
+    except ValueError:
+        return "Cheia trebuie sa fie un număr!", 1
+
     for char in input_text:
         if not (char.isalpha() or char.isspace()):
             return "Mesajul de intrare trebuie sa fie format din litere ale alfabetului englez si spatii!", 1
 
-    cheie = None
     if optiuni['operatie'] != 'spargere':
-        cheie = optiuni['cheie']
         if cheie < -100 or cheie > 100:
             return "Cheia trebuie sa fie in intervalul [-100, 100]!", 1
 
-    return Basic.cezar(input_text, cheie, optiuni['operatie']), None
+    return Basic.cezar(input_text, cheie, optiuni['operatie']), 0
 
 def _valideaza_vigenere(input_text, optiuni):
 
@@ -68,7 +72,7 @@ def _valideaza_vigenere(input_text, optiuni):
         if not char.isalpha():
             return "Cheia trebuie sa fie formata doar din litere ale alfabetului englez!", 1
 
-    return Basic.vignere(input_text, cheie, optiuni['operatie'])
+    return Basic.vignere(input_text, cheie, optiuni['operatie']), 0
 
 def _valideaza_polybius(input_text, optiuni):
 
@@ -109,7 +113,7 @@ def _valideaza_polybius(input_text, optiuni):
                 if int(digit) < 0 or int(digit) > 6:
                     return "Cifrele trebuie să fie cuprinse între 0 și 6!", 1
 
-    return Polybius.polybius(input_text, alphabet, optiuni['operatie'])
+    return Polybius.polybius(input_text, alphabet, optiuni['operatie']), 0
 
 def _valideaza_bifid(input_text, optiuni):
 
@@ -123,7 +127,7 @@ def _valideaza_bifid(input_text, optiuni):
     if undef_chars:
        return undef_chars, 1
 
-    return Polybius.bifid(input_text, alphabet, optiuni['operatie'])
+    return Polybius.bifid(input_text, alphabet, optiuni['operatie']), 0
 
 def _valideaza_adfgvx(input_text, optiuni):
 
@@ -154,7 +158,7 @@ def _valideaza_adfgvx(input_text, optiuni):
         if len(input_text_words) != len(key):
             return "Numărul de cuvinte din mesaj trebuie să fie egal cu lungimea cheii!", 1
 
-    return Polybius.adfgvx(input_text, alphabet, key, optiuni['operatie'])
+    return Polybius.adfgvx(input_text, alphabet, key, optiuni['operatie']), 0
 
 def _playfair_validation_plain(message):
 
@@ -219,7 +223,7 @@ def _valideaza_playfair(input_text, optiuni):
     if rez:
         return rez, 1
 
-    return DigrafSub.playfair(input_text, cheie, mod)
+    return DigrafSub.playfair(input_text, cheie, mod), 0
 
 def _hill_validation_key(key):
     key_len = len(key)
@@ -318,7 +322,7 @@ def _valideaza_rc4(input_text, optiuni):
 
     return Rivest.rc4(input_text, cheie, mod), 0
 
-def aes128_validation_cypher(message):
+def _aes128_validation_cypher(message):
 
     if len(message.replace(" ", "")) % 2 != 0:
         return f"Eroare: mesajul este de lungime invalidă."
@@ -339,7 +343,7 @@ def aes128_validation_cypher(message):
 
     return None
 
-def key_validation_aes(key, expected_length, format):
+def _key_validation_aes(key, expected_length, format):
 
     valid_chars = []
 
@@ -371,12 +375,12 @@ def _valideaza_aes(input_text, optiuni):
 
     expected_length = 16 if tip == '128' else 32
 
-    rez = key_validation_aes(cheie, expected_length, format_cheie)
+    rez = _key_validation_aes(cheie, expected_length, format_cheie)
     if rez:
         return rez, 1
 
     if mod == "decriptare":
-        rez = aes128_validation_cypher(input_text)
+        rez = _aes128_validation_cypher(input_text)
         if rez:
             return rez, 1
 
@@ -392,7 +396,7 @@ def _hashing(input_text, optiuni):
 
     return None
 
-def enigma_validation_cypher_plain(message):
+def _enigma_validation_cypher_plain(message):
 
     valid_chars = [" "]
 
@@ -408,7 +412,7 @@ def enigma_validation_cypher_plain(message):
 
     return None
 
-def check_whitespaces(space):
+def _check_whitespaces(space):
 
     counter = 0
     used_chars = []
@@ -437,15 +441,15 @@ def check_whitespaces(space):
 
     return None
 
-def plugboard_validation(key):
+def _plugboard_validation(key):
 
-    rez = check_whitespaces(key)
+    rez = _check_whitespaces(key)
     if rez:
         return rez, 1
 
     return None
 
-def from_array2dict(arr):
+def _from_array2dict(arr):
 
     enigma_dict = {}
 
@@ -474,15 +478,15 @@ def _valideaza_enigma(input_text, optiuni):
     if model not in ('1', '3', '4'):
         raise ValueError('Modelul poate fii 1, (m)3 sau (m)4 (shark)')
 
-    rez = plugboard_validation(tablou)
+    rez = _plugboard_validation(tablou)
     if rez:
         return rez, 1
 
-    tablou = from_array2dict(tablou)  # tablou devine dictionar,
+    tablou = _from_array2dict(tablou)  # tablou devine dictionar,
         # fiecare pereche de litere devine o pereche cheie:valoare,
         # unde cheia e prima litera, iar valoarea e a doua litera
 
-    rez = enigma_validation_cypher_plain(input_text)
+    rez = _enigma_validation_cypher_plain(input_text)
     if rez:
         return rez, 1
 
@@ -490,7 +494,6 @@ def _valideaza_enigma(input_text, optiuni):
         return Enigma.enigma1(input_text, reflector, rotor1, rotor2, rotor3, tablou)
     else:
         return Enigma.enigma4(input_text, reflector, spec_rotor, rotor1, rotor2, rotor3, tablou)
-
 
 def main_validator(nume_algoritm, text_intrare, optiuni):
 
