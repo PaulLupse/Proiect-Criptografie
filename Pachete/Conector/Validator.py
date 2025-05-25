@@ -7,7 +7,7 @@ from ..Algoritmi import Hashing
 from ..Algoritmi import Block
 from ..Utilități import Utilities
 
-# functiile de validare returneaza o valoare diferita de 0 daca este gasita vreo eroare
+# subfunctiile de validare returneaza o valoare diferita de 0 daca este gasita vreo eroare
 # astfel, la validare, verificam daca functia returneaza ceva
 # daca da, atunci avem o Eroare: deci o returnam, impreuna cu codul 1
 # daca nu este gasita nicio Eroare: este returnat mesajul criptat/decriptat/spart impreuna cu codul 0
@@ -17,10 +17,10 @@ def _verify_duplicate_values(entry_vals):
     duplicate_values = set()
 
     for entry in entry_vals["alfabet"]:
-        value = entry.get()
-        if value in duplicate_values:
+        
+        if entry in duplicate_values:
             return "Matricea conține caractere duplicate!", 1
-        duplicate_values.add(value)
+        duplicate_values.add(entry)
 
     return None
 
