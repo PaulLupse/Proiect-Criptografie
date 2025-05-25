@@ -162,7 +162,7 @@ def hill(mesaj, cheie, operatie):
     sqrt_lung_cheie = int(len(cheie) ** (1/2))
 
     while len(mesaj) % sqrt_lung_cheie != 0: # daca mesajul nu este de lungime divizibila cu 2 sau 3
-        mesaj += 'z'   # adaugam un caracter filler
+        mesaj += 'q'   # adaugam un caracter filler
 
     # construim matricea de criptare, care are ca elemente pozitiile din alfabet ale caracterelor cheii
     matrice_cheie = np.zeros((sqrt_lung_cheie, sqrt_lung_cheie), dtype = int)
@@ -200,7 +200,7 @@ def hill(mesaj, cheie, operatie):
     # operatia de criptare e similara,
     # singura diferenta fiind faptul ca inmultim matricile vector cu inversa matricei cheie
     else:
-
+        print(matrice_cheie)
         # inversa matricei este calculata modulo 26
         inversa_matrice_cheie = np.array(sp.Matrix(matrice_cheie).inv_mod(26))
 
@@ -225,8 +225,13 @@ def hill(mesaj, cheie, operatie):
 
             index_mesaj += sqrt_lung_cheie
 
+        # caracterele z de la sfarsit le consideram filler
+        while ((mesaj_decriptat[-1] == 'q')
+               and ((len(mesaj_decriptat) - 1) % sqrt_lung_cheie > 0)):
+            mesaj_decriptat = mesaj_decriptat[:-1:]
+
         return mesaj_decriptat
 
 if __name__ == '__main__':
-    a = hill('glw xop ewh osl ick wal wgp ifa jes usb ccw doj szq iaz wgp', 'GYBNQKURP', 'decriptare')
+    a = hill('gp', 'AHGJ', 'decriptare')
     print(a)

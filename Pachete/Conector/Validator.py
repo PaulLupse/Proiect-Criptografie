@@ -1,3 +1,5 @@
+from sympy.matrices.exceptions import NonInvertibleMatrixError
+
 from ..Algoritmi import Basic
 from ..Algoritmi import Polybius
 from ..Algoritmi import Enigma
@@ -176,8 +178,8 @@ def _validate_adfgvx(input_text, options):
 
     return Polybius.adfgvx(input_text, alfabet, key, options['operatie']), 0
 
-# folosita la criptare
-def _playfair_validation_plain(message):
+# validarea cheii
+def _key_validation_playfair(key):
 
     valid_chars = [" "]
 
@@ -187,37 +189,12 @@ def _playfair_validation_plain(message):
     for UPPER_letter in range(65, 91):
         valid_chars.append(chr(UPPER_letter))
 
-    for letter in message:
-        if letter not in valid_chars:
-            return f"Mesajul tău conține caractere invalide: {letter}."
-
-    return message
-
-# folosita la decriptare
-def _playfair_validation_cypher(message):
-
-    valid_chars = []
-
-    for LOWER_letter in range(97, 123):
-        valid_chars.append(chr(LOWER_letter))
-
-    for letter in message:
-        if letter not in valid_chars:
-            return f"Mesajul tău conține caractere invalide: {letter}."
-
-    return message
-
-# validarea cheii
-def _key_validation_playfair(key):
-
-    valid_chars = []
-
-    for LOWER_letter in range(97, 123):
-        valid_chars.append(chr(LOWER_letter))
-
+    invalid_chars = []
     for letter in key:
         if letter not in valid_chars:
-            return f"Mesajul tău conține caractere invalide: {letter}."
+            valid_chars.append(letter)
+    if invalid_chars:
+        return f"Mesajul conține caractere invalide: {', '.join(sorted(invalid_chars))}"
 
     return None
 
@@ -235,9 +212,12 @@ def _validate_playfair(input_text, options):
     for UPPER_letter in range(65, 91):
         valid_chars.append(chr(UPPER_letter))
 
+    invalid_chars = []
     for letter in input_text:
         if letter not in valid_chars:
-            return f"Mesajul tău conține caractere invalide: {letter}.", 1
+            valid_chars.append(letter)
+    if invalid_chars:
+        return f"Mesajul conține caractere invalide: {', '.join(sorted(invalid_chars))}", 1
 
     rez = _key_validation_playfair(cheie)
     if rez:
@@ -252,38 +232,24 @@ def _hill_validation_key(key):
 
     if key_len != 4 and key_len != 9:
         return f"Cheia {key} nu are strict 4 sau 9 caractere."
-    elif key_len == 4:
-        square_matrix2 = []
-        k = 0
 
-        for i in range(2):
-            row = []
-            for j in range(2):
-                row.append(ord(key[k]))
-                k += 1
-            square_matrix2.append(row)
+    k = 0
 
+    try:
+        import numpy, sympy
+        sqrt_len_key = 2 if key_len == 4 else 3
+        key_matrix = numpy.zeros((sqrt_len_key, sqrt_len_key), dtype = int)
+        key_index = 0
 
-        delta = Utilities.second_order_det(square_matrix2)
+        for i in range(0, sqrt_len_key):
+            for j in range(0, sqrt_len_key):
+                key_matrix[i][j] = ord(key[key_index]) - 97
+                key_index += 1
 
-        if delta == 0:
-            return f"Matricea {square_matrix2} nu este inversabilă, determinantul este egal cu {delta}. Schimbarea unui caracter poate rezolva eroarea."
+        sympy.Matrix(key_matrix).inv_mod(26)
 
-    else:
-        square_matrix3 = []
-        k = 0
-
-        for i in range(3):
-            row = []
-            for j in range(3):
-                row.append(ord(key[k]))
-                k += 1
-            square_matrix3.append(row)
-
-        delta = Utilities.third_order_det(square_matrix3)
-
-        if delta == 0:
-            return f"Matricea {square_matrix3} nu este inversabilă, pentru că determinantul este egal cu: {delta}. Schimbarea unui caracter poate rezolva eroarea."
+    except NonInvertibleMatrixError:
+        return f"Matricea formată din caracterele cheii nu este inversabilă. Schimbarea unui caracter poate rezolva eroarea."
 
     return None
 
@@ -298,9 +264,12 @@ def _validate_hill(input_text, options):
     for UPPER_letter in range(65, 91):
         valid_chars.append(chr(UPPER_letter))
 
+    invalid_chars = []
     for letter in input_text:
         if letter not in valid_chars:
-            return f"Mesajul tău conține caractere invalide: {letter}", 1
+            valid_chars.append(letter)
+    if invalid_chars:
+        return f"Mesajul conține caractere invalide: {', '.join(sorted(invalid_chars))}", 1
 
     cheie = options['cheie']
     operation = options['operatie']
@@ -430,14 +399,32 @@ def _enigma_validation_cypher_plain(message):
     for UPPER_letter in range(65, 91):
         valid_chars.append(chr(UPPER_letter))
 
+    invalid_chars = []
     for letter in message:
         if letter not in valid_chars:
-            return f"Eroare, mesajul tău conține caractere invalide: {letter}"
+            valid_chars.append(letter)
+    if invalid_chars:
+        return f"Mesajul conține caractere invalide: {', '.join(sorted(invalid_chars))}", 1
 
     return None
 
 # verifica tabloul de comutare (?)
 def _plugboard_validation(key):
+
+    valid_chars = [" "]
+
+    for LOWER_letter in range(97, 123):
+        valid_chars.append(chr(LOWER_letter))
+
+    for UPPER_letter in range(65, 91):
+        valid_chars.append(chr(UPPER_letter))
+
+    invalid_chars = []
+    for letter in key:
+        if letter not in valid_chars:
+            valid_chars.append(letter)
+    if invalid_chars:
+        return f"Tabloul conține caractere invalide: {', '.join(sorted(invalid_chars))}"
 
     counter = 0
     used_chars = []
@@ -491,10 +478,10 @@ def _validate_enigma(input_text, options):
         spec_rotor = options['spec_rotor']
     else: spec_rotor = None
 
-    operationel = options['operationel'] # 1, 3 sau 4
+    model = options['model'] # 1, 3 sau 4
 
-    if operationel not in ('1', '3', '4'):
-        raise ValueError('operationelul poate fii 1, (m)3 sau (m)4 (shark)')
+    if model not in ('1', '3', '4'):
+        raise ValueError('model poate fii 1, (m)3 sau (m)4 (shark)')
 
     rez = _plugboard_validation(plugboard)
     if rez:
@@ -508,7 +495,7 @@ def _validate_enigma(input_text, options):
     if rez:
         return rez, 1
 
-    if operationel == '1' or operationel == '3':
+    if model == '1' or model == '3':
         return Enigma.enigma1(input_text, reflector, rotor1, rotor2, rotor3, tablou)
     else:
         return Enigma.enigma4(input_text, reflector, spec_rotor, rotor1, rotor2, rotor3, tablou)
