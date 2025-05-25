@@ -322,7 +322,7 @@ def adfgvx(mesaj, alfabet, cheie, operatie):
         return mesaj_decriptat
 
 if __name__ == '__main__':
-    a = adfgvx('afdfgaagvgdfdadadg agagavgffvgfaffaag ffgdgfavaaaafggvgf gagagdagadavdaafgv aavaafdgafdgaafava', 'abcdefghiklmnopqrstuvwxyz', 'salut', 'decriptare')
+    a = adfgvx('a\t\t\t\t\t'.replace(' ', ''), 'abcdefghiklmnopqrstuvwxyz', 'salut', 'criptare')
     print(a)
 
 "La soare roata se mareste la umbra numai carnea creste"

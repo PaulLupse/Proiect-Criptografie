@@ -39,7 +39,7 @@ def _undefined_characters(input_text, alfabet):
         if char_text in special_cases:
             if "i" not in alfabet and "j" not in alfabet:
                 undefined_chars.add("i/j")
-        elif char_text != " "and char_text not in alfabet:
+        elif char_text != " " and char_text not in alfabet:
                 undefined_chars.add(char_text)
     if undefined_chars:
         return f"Mesajul conține caractere nedefinite în alfabet: {', '.join(sorted(undefined_chars))}"
@@ -518,7 +518,8 @@ def main_validator(algorithm_name, input_text, options):
 
     validator_dict = {'cezar':_validate_cezar, 'vigenere':_validate_vigenere, 'polybius':_validate_polybius,
                             'adfgvx':_validate_adfgvx, 'bifid':_validate_bifid, 'playfair':_validate_playfair,
-                            'hill':_validate_hill, 'rc4':_validate_rc4,'aes':_validate_aes, 'enigma':_validate_enigma}
+                            'hill':_validate_hill, 'rc4':_validate_rc4,'aes':_validate_aes, 'enigma':_validate_enigma,
+                      'hashing':_hashing}
 
     # verificari preliminatorii
 
