@@ -369,6 +369,9 @@ def _key_validation_aes(key, expected_length, format):
     valid_chars = []
 
     if format == 'hex':
+        expected_length *= 2
+
+    if format == 'hex':
         for LOWER_letter in range(97, 103):
             valid_chars.append(chr(LOWER_letter))
 
@@ -395,7 +398,7 @@ def _validate_aes(input_text, options):
     type = options['tip']
     format_key = options['format_cheie']
 
-    expected_length = 16 if type == '128' else 32
+    expected_length = 16 if type == 'AES-128' else 32
 
     rez = _key_validation_aes(key, expected_length, format_key)
     if rez:
