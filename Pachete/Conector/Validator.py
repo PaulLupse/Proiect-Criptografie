@@ -7,16 +7,15 @@ from ..Algoritmi import DigrafSub
 from ..Algoritmi import Rivest
 from ..Algoritmi import Hashing
 from ..Algoritmi import Block
-from ..Utilități import Utilities
 
 # fiecare algoritm are o functie specifica de validare (in afara de variantele unui algoritm)
 # fiecare functie de validare returneaza un raspuns si un cod
-# daca codul este 0, atunci nu a fost gasita nici o eroare si este returnat mesajul criptat/decriptat/spart
-# daca codul este 1, returneaza un mesaj de eroare
+# pentru cod 0, atunci nu a fost gasita nici o eroare si este returnat mesajul criptat/decriptat/spart
+# pentru cod 1, returneaza un mesaj de eroare
 
 # subfunctiile de validare (de ex, _verify_duplicate_values) returneaza o valoare diferita de None daca este gasita vreo eroare
 
-# verifica caractere duplicate in alfabet
+# verifica, caractere duplicate in alfabet
 def _verify_duplicate_values(entry_vals):
 
     duplicate_values = set()
@@ -29,7 +28,7 @@ def _verify_duplicate_values(entry_vals):
 
     return None
 
-# verifica caractere nedefinite in mesaj
+# verifica, caractere nedefinite in mesaj
 def _undefined_characters(input_text, alfabet):
 
     input_text = input_text.lower()
@@ -232,8 +231,6 @@ def _hill_validation_key(key):
 
     if key_len != 4 and key_len != 9:
         return f"Cheia {key} nu are strict 4 sau 9 caractere."
-
-    k = 0
 
     try:
         import numpy, sympy
