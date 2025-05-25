@@ -7,11 +7,14 @@ from ..Algoritmi import Hashing
 from ..Algoritmi import Block
 from ..Utilități import Utilities
 
-# subfunctiile de validare returneaza o valoare diferita de 0 daca este gasita vreo eroare
-# astfel, la validare, verificam daca functia returneaza ceva
-# daca da, atunci avem o Eroare: deci o returnam, impreuna cu codul 1
-# daca nu este gasita nicio Eroare: este returnat mesajul criptat/decriptat/spart impreuna cu codul 0
+# fiecare algoritm are o functie specifica de validare (in afara de variantele unui algoritm)
+# fiecare functie de validare returneaza un raspuns si un cod
+# daca codul este 0, atunci nu a fost gasita nici o eroare si este returnat mesajul criptat/decriptat/spart
+# daca codul este 1, returneaza un mesaj de eroare
 
+# subfunctiile de validare (de ex, _verify_duplicate_values) returneaza o valoare diferita de None daca este gasita vreo eroare
+
+# verifica caractere duplicate in alfabet
 def _verify_duplicate_values(entry_vals):
 
     duplicate_values = set()
@@ -24,6 +27,7 @@ def _verify_duplicate_values(entry_vals):
 
     return None
 
+# verifica caractere nedefinite in mesaj
 def _undefined_characters(input_text, alfabet):
 
     input_text = input_text.lower()
@@ -42,6 +46,7 @@ def _undefined_characters(input_text, alfabet):
     else:
         return None
 
+# functie de validare pt cifrul lui cezar
 def _validate_cezar(input_text, options):
 
     try:
@@ -59,6 +64,7 @@ def _validate_cezar(input_text, options):
 
     return Basic.cezar(input_text, cheie, options['operatie']), 0
 
+# functie de validare pt cifrul lui vigenere
 def _validate_vigenere(input_text, options):
 
     for char in input_text:
@@ -73,6 +79,7 @@ def _validate_vigenere(input_text, options):
 
     return Basic.vignere(input_text, cheie, options['operatie']), 0
 
+# functie de validare pt cifrul lui polybius
 def _validate_polybius(input_text, options):
 
     alfabet = options['alfabet']
@@ -114,6 +121,7 @@ def _validate_polybius(input_text, options):
 
     return Polybius.polybius(input_text, alfabet, options['operatie']), 0
 
+# functie de validare pt cifrul bifid
 def _validate_bifid(input_text, options):
 
     alfabet = options['alfabet']
@@ -128,6 +136,7 @@ def _validate_bifid(input_text, options):
 
     return Polybius.bifid(input_text, alfabet, options['operatie']), 0
 
+# functie de validare pt cifrul adfgvx
 def _validate_adfgvx(input_text, options):
 
     alfabet = options['alfabet']
@@ -163,6 +172,7 @@ def _validate_adfgvx(input_text, options):
 
     return Polybius.adfgvx(input_text, alfabet, key, options['operatie']), 0
 
+# folosita la criptare
 def _playfair_validation_plain(message):
 
     valid_chars = [" "]
@@ -179,6 +189,7 @@ def _playfair_validation_plain(message):
 
     return message
 
+# folosita la decriptare
 def _playfair_validation_cypher(message):
 
     valid_chars = []
@@ -192,6 +203,7 @@ def _playfair_validation_cypher(message):
 
     return message
 
+# validarea cheii
 def _key_validation_playfair(key):
 
     valid_chars = []
@@ -205,6 +217,7 @@ def _key_validation_playfair(key):
 
     return None
 
+# functie de validare pt cifrul playfair
 def _validate_playfair(input_text, options):
 
     operation = options['operatie']
@@ -228,6 +241,7 @@ def _validate_playfair(input_text, options):
 
     return DigrafSub.playfair(input_text, cheie, operation), 0
 
+# validarea cheii
 def _hill_validation_key(key):
 
     key_len = len(key)
@@ -269,6 +283,7 @@ def _hill_validation_key(key):
 
     return None
 
+# functie de validare pt cifrul hill
 def _validate_hill(input_text, options):
 
     valid_chars = [" "]
@@ -292,9 +307,7 @@ def _validate_hill(input_text, options):
 
     return DigrafSub.hill(input_text, cheie, operation), 0
 
-def rc4_validation_plain():
-    return None
-
+# folosita la decriptare
 def rc4_validation_cypher(message):
 
     valid_chars = []
@@ -311,6 +324,7 @@ def rc4_validation_cypher(message):
 
     return None
 
+# functie de validare pt cifrul rivest
 def _validate_rc4(input_text, options):
 
     key = options['cheie']
@@ -323,6 +337,7 @@ def _validate_rc4(input_text, options):
 
     return Rivest.rc4(input_text, key, operation), 0
 
+# folosita la decriptare
 def _aes128_validation_cypher(message):
 
     if len(message.replace(" ", "")) % 2 != 0:
@@ -344,6 +359,7 @@ def _aes128_validation_cypher(message):
 
     return None
 
+# validarea cheii
 def _key_validation_aes(key, expected_length, format):
 
     valid_chars = []
@@ -367,6 +383,7 @@ def _key_validation_aes(key, expected_length, format):
         return f"Cheia {key} nu are strict {expected_length} caractere"
     return None
 
+# functie de validare pt standardul avansat de criptare
 def _validate_aes(input_text, options):
 
     operation = options['operatie']
@@ -387,6 +404,7 @@ def _validate_aes(input_text, options):
 
     return Block.aes(input_text, key, format_key, operation), 0
 
+# validarea nu are sens pt hashing
 def _hashing(input_text, options):
 
     varianta = options['varianta']
@@ -397,6 +415,7 @@ def _hashing(input_text, options):
 
     return None
 
+# folosita atat la criptare cat si decriptare (deoarece operatiile sunt confundate)
 def _enigma_validation_cypher_plain(message):
 
     valid_chars = [" "]
@@ -413,43 +432,37 @@ def _enigma_validation_cypher_plain(message):
 
     return None
 
-def _check_whitespaces(space):
+# verifica tabloul de comutare (?)
+def _plugboard_validation(key):
 
     counter = 0
     used_chars = []
     white_space_count = 0
 
-    for i in range(len(space)):
-        if space[i] in used_chars:
-            return f"Eroare, \"{space[i]}\" nu are voie să se repete."
+    for i in range(len(key)):
+        if key[i] in used_chars:
+            return f"Eroare, \"{key[i]}\" nu are voie să se repete."
 
-        if space[i] != " ":
+        if key[i] != " ":
             counter += 1
-            used_chars.append(space[i])
+            used_chars.append(key[i])
             white_space_count = 0
         else:
             if counter == 1:
-                return f"Eroare, caracterul \"{space[i - 1]}\" nu are pereche."
+                return f"Eroare, caracterul \"{key[i - 1]}\" nu are pereche."
 
             counter = 0
             white_space_count += 1
 
         if white_space_count == 2 or counter == 3:
-            return f"Eroare, \"{space[i]}\" nu respecta cerintele de formatare"
+            return f"Eroare, \"{key[i]}\" nu respecta cerintele de formatare"
 
     if counter == 1:
-        return f"Eroare, \'{space[-1]}\' nu are pereche"
+        return f"Eroare, \'{key[-1]}\' nu are pereche"
 
     return None
 
-def _plugboard_validation(key):
-
-    rez = _check_whitespaces(key)
-    if rez:
-        return rez, 1
-
-    return None
-
+# transforma lista de perechi de litere intr-un dictionar
 def _from_array2dict(arr):
 
     enigma_dict = {}
@@ -461,6 +474,7 @@ def _from_array2dict(arr):
 
     return enigma_dict
 
+# functie de validare pt enigma
 def _validate_enigma(input_text, options):
 
     reflector = options['reflector']
@@ -495,6 +509,7 @@ def _validate_enigma(input_text, options):
     else:
         return Enigma.enigma4(input_text, reflector, spec_rotor, rotor1, rotor2, rotor3, tablou)
 
+# functia apelata de frontend pentru accesarea backend-ului
 def main_validator(algorithm_name, input_text, options):
 
     validator_dict = {'cezar':_validate_cezar, 'vigenere':_validate_vigenere, 'polybius':_validate_polybius,
@@ -512,6 +527,7 @@ def main_validator(algorithm_name, input_text, options):
     if options['operatie'] not in ('criptare', 'decriptare', 'spargere'):
         raise ValueError("Operatia trebuie sa fie 'criptare', 'decriptare' sau 'spargere'.")
 
+    # returneaza valiarea fiecarui algoritm in parte, dupa nume si mesaj input
     return validator_dict[algorithm_name](input_text, options)
 
 if __name__ == '__main__':
