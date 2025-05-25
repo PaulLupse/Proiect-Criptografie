@@ -17,7 +17,7 @@ def _verify_duplicate_values(entry_vals):
     duplicate_values = set()
 
     for entry in entry_vals["alfabet"]:
-        
+
         if entry in duplicate_values:
             return "Matricea conține caractere duplicate!", 1
         duplicate_values.add(entry)
@@ -87,7 +87,7 @@ def _validate_polybius(input_text, options):
             return undef_chars, 1
 
     else:
-        size_combobox = options["size_combobox"].get()
+        size_combobox = options["marime_matrice"]
         digits_text = input_text.replace(" ", "")
 
         for char in input_text:
