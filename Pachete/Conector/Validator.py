@@ -16,7 +16,7 @@ def _verify_duplicate_values(entry_vals):
 
     duplicate_values = set()
 
-    for entry in entry_vals["matrix_entry"]:
+    for entry in entry_vals["alfabet"]:
         value = entry.get()
         if value in duplicate_values:
             return "Matricea conține caractere duplicate!", 1
@@ -42,11 +42,10 @@ def _undefined_characters(input_text, alphabet):
     else:
         return None
 
-def _valideaza_cezar(input_text, optiuni):
+def _validate_cezar(input_text, options):
 
-    cheie = None
     try:
-        cheie = int(optiuni['cheie'])
+        cheie = int(options['cheie'])
     except ValueError:
         return "Cheia trebuie sa fie un număr!", 1
 
@@ -54,41 +53,41 @@ def _valideaza_cezar(input_text, optiuni):
         if not (char.isalpha() or char.isspace()):
             return "Mesajul de intrare trebuie sa fie format din litere ale alfabetului englez si spatii!", 1
 
-    if optiuni['operatie'] != 'spargere':
+    if options['operatie'] != 'spargere':
         if cheie < -100 or cheie > 100:
             return "Cheia trebuie sa fie in intervalul [-100, 100]!", 1
 
-    return Basic.cezar(input_text, cheie, optiuni['operatie']), 0
+    return Basic.cezar(input_text, cheie, options['operatie']), 0
 
-def _valideaza_vigenere(input_text, optiuni):
+def _validate_vigenere(input_text, options):
 
     for char in input_text:
         if not (char.isalpha() or char.isspace()):
             return "Mesajul de intrare trebuie sa fie litere ale alfabetului englez si spatii!", 1
 
-    cheie = optiuni['cheie']
+    cheie = options['cheie']
 
     for char in cheie:
         if not char.isalpha():
             return "Cheia trebuie sa fie formata doar din litere ale alfabetului englez!", 1
 
-    return Basic.vignere(input_text, cheie, optiuni['operatie']), 0
+    return Basic.vignere(input_text, cheie, options['operatie']), 0
 
-def _valideaza_polybius(input_text, optiuni):
+def _validate_polybius(input_text, options):
 
-    alphabet = optiuni['alphabet']
+    alphabet = options['alphabet']
 
-    dup_vals = _verify_duplicate_values(optiuni)
+    dup_vals = _verify_duplicate_values(options)
     if dup_vals:
         return dup_vals, 1
 
-    if optiuni['operatie'] == 'criptare':
+    if options['operatie'] == 'criptare':
         undef_chars = _undefined_characters(input_text, alphabet)
         if undef_chars:
             return undef_chars, 1
 
     else:
-        size_combobox = optiuni["size_combobox"].get()
+        size_combobox = options["size_combobox"].get()
         digits_text = input_text.replace(" ", "")
 
         for char in input_text:
@@ -113,13 +112,13 @@ def _valideaza_polybius(input_text, optiuni):
                 if int(digit) < 0 or int(digit) > 6:
                     return "Cifrele trebuie să fie cuprinse între 0 și 6!", 1
 
-    return Polybius.polybius(input_text, alphabet, optiuni['operatie']), 0
+    return Polybius.polybius(input_text, alphabet, options['operatie']), 0
 
-def _valideaza_bifid(input_text, optiuni):
+def _validate_bifid(input_text, options):
 
-    alphabet = optiuni['alphabet']
+    alphabet = options['alphabet']
 
-    dup_vals = _verify_duplicate_values(optiuni)
+    dup_vals = _verify_duplicate_values(options)
     if dup_vals:
         return dup_vals, 1
 
@@ -127,14 +126,14 @@ def _valideaza_bifid(input_text, optiuni):
     if undef_chars:
        return undef_chars, 1
 
-    return Polybius.bifid(input_text, alphabet, optiuni['operatie']), 0
+    return Polybius.bifid(input_text, alphabet, options['operatie']), 0
 
-def _valideaza_adfgvx(input_text, optiuni):
+def _validate_adfgvx(input_text, options):
 
-    alphabet = optiuni['alphabet']
-    key = optiuni['cheie']
+    alphabet = options['alphabet']
+    key = options['cheie']
 
-    if optiuni['operatie'] == 'criptare':
+    if options['operatie'] == 'criptare':
         ok = False
         for char in alphabet:
             if char == " ":
@@ -158,7 +157,7 @@ def _valideaza_adfgvx(input_text, optiuni):
         if len(input_text_words) != len(key):
             return "Numărul de cuvinte din mesaj trebuie să fie egal cu lungimea cheii!", 1
 
-    return Polybius.adfgvx(input_text, alphabet, key, optiuni['operatie']), 0
+    return Polybius.adfgvx(input_text, alphabet, key, options['operatie']), 0
 
 def _playfair_validation_plain(message):
 
@@ -202,10 +201,10 @@ def _key_validation_playfair(key):
 
     return None
 
-def _valideaza_playfair(input_text, optiuni):
+def _validate_playfair(input_text, options):
 
-    mod = optiuni['operatie']
-    cheie = optiuni['cheie']
+    operation = options['operatie']
+    cheie = options['cheie']
 
     valid_chars = [" "]
 
@@ -223,9 +222,10 @@ def _valideaza_playfair(input_text, optiuni):
     if rez:
         return rez, 1
 
-    return DigrafSub.playfair(input_text, cheie, mod), 0
+    return DigrafSub.playfair(input_text, cheie, operation), 0
 
 def _hill_validation_key(key):
+
     key_len = len(key)
 
     if key_len != 4 and key_len != 9:
@@ -265,7 +265,7 @@ def _hill_validation_key(key):
 
     return None
 
-def _valideaza_hill(input_text, optiuni):
+def _validate_hill(input_text, options):
 
     valid_chars = [" "]
 
@@ -279,16 +279,16 @@ def _valideaza_hill(input_text, optiuni):
         if letter not in valid_chars:
             return f"Mesajul tău conține caractere invalide: {letter}", 1
 
-    cheie = optiuni['cheie']
-    mod = optiuni['operatie']
+    cheie = options['cheie']
+    operation = options['operatie']
 
     rez = _hill_validation_key(cheie)
     if rez:
         return rez, 1
 
-    return DigrafSub.hill(input_text, cheie, mod), 0
+    return DigrafSub.hill(input_text, cheie, operation), 0
 
-def rc4_validation_plain(message):
+def rc4_validation_plain():
     return None
 
 def rc4_validation_cypher(message):
@@ -307,20 +307,17 @@ def rc4_validation_cypher(message):
 
     return None
 
-def key_validation(key):
-    return None
+def _validate_rc4(input_text, options):
 
-def _valideaza_rc4(input_text, optiuni):
+    key = options['cheie']
+    operation = options['operatie']
 
-    cheie = optiuni['cheie']
-    mod = optiuni['operatie']
-
-    if mod == "decriptare":
+    if operation == "decriptare":
         rez = rc4_validation_cypher(input_text)
         if rez:
             return rez, 1
 
-    return Rivest.rc4(input_text, cheie, mod), 0
+    return Rivest.rc4(input_text, key, operation), 0
 
 def _aes128_validation_cypher(message):
 
@@ -366,29 +363,29 @@ def _key_validation_aes(key, expected_length, format):
         return f"Cheia {key} nu are strict {expected_length} caractere"
     return None
 
-def _valideaza_aes(input_text, optiuni):
+def _validate_aes(input_text, options):
 
-    mod = optiuni['operatie']
-    cheie = optiuni['cheie']
-    tip = optiuni['tip']
-    format_cheie = optiuni['format_cheie']
+    operation = options['operatie']
+    key = options['cheie']
+    type = options['tip']
+    format_key = options['format_cheie']
 
-    expected_length = 16 if tip == '128' else 32
+    expected_length = 16 if type == '128' else 32
 
-    rez = _key_validation_aes(cheie, expected_length, format_cheie)
+    rez = _key_validation_aes(key, expected_length, format_key)
     if rez:
         return rez, 1
 
-    if mod == "decriptare":
+    if operation == "decriptare":
         rez = _aes128_validation_cypher(input_text)
         if rez:
             return rez, 1
 
-    return Block.aes(input_text, cheie, format_cheie, mod), 0
+    return Block.aes(input_text, key, format_key, operation), 0
 
-def _hashing(input_text, optiuni):
+def _hashing(input_text, options):
 
-    varianta = optiuni['varianta']
+    varianta = options['varianta']
     if varianta == 'SHA-1':
         return Hashing.sha_1(input_text)
     elif varianta == 'SHA-256':
@@ -460,29 +457,28 @@ def _from_array2dict(arr):
 
     return enigma_dict
 
-def _valideaza_enigma(input_text, optiuni):
+def _validate_enigma(input_text, options):
 
-    operatie = optiuni['operatie']
-    reflector = optiuni['reflector']
-    rotor1 = optiuni['rotor1']
-    rotor2 = optiuni['rotor2']
-    rotor3 = optiuni['rotor3']
-    tablou = optiuni['tablou']
+    reflector = options['reflector']
+    rotor1 = options['rotor1']
+    rotor2 = options['rotor2']
+    rotor3 = options['rotor3']
+    plugboard = options['tablou']
 
-    if 'spec_rotor' in optiuni:
-        spec_rotor = optiuni['spec_rotor']
+    if 'spec_rotor' in options:
+        spec_rotor = options['spec_rotor']
     else: spec_rotor = None
 
-    model = optiuni['model'] # 1, 3 sau 4
+    operationel = options['operationel'] # 1, 3 sau 4
 
-    if model not in ('1', '3', '4'):
-        raise ValueError('Modelul poate fii 1, (m)3 sau (m)4 (shark)')
+    if operationel not in ('1', '3', '4'):
+        raise ValueError('operationelul poate fii 1, (m)3 sau (m)4 (shark)')
 
-    rez = _plugboard_validation(tablou)
+    rez = _plugboard_validation(plugboard)
     if rez:
         return rez, 1
 
-    tablou = _from_array2dict(tablou)  # tablou devine dictionar,
+    tablou = _from_array2dict(plugboard)  # tablou devine dictionar,
         # fiecare pereche de litere devine o pereche cheie:valoare,
         # unde cheia e prima litera, iar valoarea e a doua litera
 
@@ -490,45 +486,45 @@ def _valideaza_enigma(input_text, optiuni):
     if rez:
         return rez, 1
 
-    if model == '1' or model == '3':
+    if operationel == '1' or operationel == '3':
         return Enigma.enigma1(input_text, reflector, rotor1, rotor2, rotor3, tablou)
     else:
         return Enigma.enigma4(input_text, reflector, spec_rotor, rotor1, rotor2, rotor3, tablou)
 
-def main_validator(nume_algoritm, text_intrare, optiuni):
+def main_validator(algorithm_name, input_text, options):
 
-    dictionar_validatori = {'cezar':_valideaza_cezar, 'vigenere':_valideaza_vigenere, 'polybius':_valideaza_polybius,
-                            'adfgvx':_valideaza_adfgvx, 'bifid':_valideaza_bifid, 'playfair':_valideaza_playfair,
-                            'hill':_valideaza_hill, 'rc4':_valideaza_rc4,'aes':_valideaza_aes, 'enigma':_valideaza_enigma}
+    validator_dict = {'cezar':_validate_cezar, 'vigenere':_validate_vigenere, 'polybius':_validate_polybius,
+                            'adfgvx':_validate_adfgvx, 'bifid':_validate_bifid, 'playfair':_validate_playfair,
+                            'hill':_validate_hill, 'rc4':_validate_rc4,'aes':_validate_aes, 'enigma':_validate_enigma}
 
     # verificari preliminatorii
 
-    if nume_algoritm not in dictionar_validatori.keys():
+    if algorithm_name not in validator_dict.keys():
         raise ValueError("Numele algoritmului nu este definit.")
 
-    if type(optiuni) != dict:
-        raise ValueError("Argumentul 'optiuni' trebuie sa fie de tip dict!")
+    if type(options) != dict:
+        raise ValueError("Argumentul 'options' trebuie sa fie de tip dict!")
 
-    if optiuni['operatie'] not in ('criptare', 'decriptare', 'spargere'):
+    if options['operatie'] not in ('criptare', 'decriptare', 'spargere'):
         raise ValueError("Operatia trebuie sa fie 'criptare', 'decriptare' sau 'spargere'.")
 
-    return dictionar_validatori[nume_algoritm](text_intrare, optiuni)
+    return validator_dict[algorithm_name](input_text, options)
 
 if __name__ == '__main__':
 
     # exemplu de optiune pt enigma
-    optiuni = {'mesaj': 'aaaaa',
+    options = {'mesaj': 'aaaaa',
                'reflector': 'b',
                'spec_rotor': {'rotor': 'beta', 'offset': 1, 'inel': 1},
                'rotor1': {'rotor': 6, 'offset': 10, 'inel': 21},
                'rotor2': {'rotor': 7, 'offset': 15, 'inel': 11},
                'rotor3': {'rotor': 8, 'offset': 20, 'inel': 6},
                'tablou': 'bq cr di ej kw mt os px uz gh',
-               'model': '4',
+               'operationel': '4',
                'operatie': 'criptare'
                }
 
-    a = main_validator('enigma', 'wfypm', optiuni)
+    a = main_validator('enigma', 'wfypm', options)
     print(a)
 
 
