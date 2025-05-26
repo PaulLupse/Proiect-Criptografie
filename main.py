@@ -1,4 +1,4 @@
 if __name__ == "__main__":
-    import Pachete.Interfață.main_GUI
+    import pachete.interfață.main_gui
 
-    Pachete.Interfață.main_GUI.main()
+    pachete.interfață.main_gui.main()

@@ -1,12 +1,12 @@
 from sympy.matrices.exceptions import NonInvertibleMatrixError
 
-from ..Algoritmi import Basic
-from ..Algoritmi import Polybius
-from ..Algoritmi import Enigma
-from ..Algoritmi import DigrafSub
-from ..Algoritmi import Rivest
-from ..Algoritmi import Hashing
-from ..Algoritmi import Block
+from ..algoritmi import basic
+from ..algoritmi import polybius
+from ..algoritmi import enigma
+from ..algoritmi import digraf_sub
+from ..algoritmi import rivest
+from ..algoritmi import hashing
+from ..algoritmi import block
 
 # fiecare algoritm are o functie specifica de validare (in afara de variantele unui algoritm)
 # fiecare functie de validare returneaza un raspuns si un cod
@@ -63,7 +63,7 @@ def _validate_cezar(input_text, options):
         if cheie < -100 or cheie > 100:
             return "Cheia trebuie sa fie in intervalul [-100, 100]!", 1
 
-    return Basic.cezar(input_text, cheie, options['operatie']), 0
+    return basic.cezar(input_text, cheie, options['operatie']), 0
 
 # functie de validare pt cifrul lui vigenere
 def _validate_vigenere(input_text, options):
@@ -78,7 +78,7 @@ def _validate_vigenere(input_text, options):
         if not char.isalpha():
             return "Cheia trebuie sa fie formata doar din litere ale alfabetului englez!", 1
 
-    return Basic.vignere(input_text, cheie, options['operatie']), 0
+    return basic.vignere(input_text, cheie, options['operatie']), 0
 
 # functie de validare pt cifrul lui polybius
 def _validate_polybius(input_text, options):
@@ -120,7 +120,7 @@ def _validate_polybius(input_text, options):
                 if int(digit) < 0 or int(digit) > 6:
                     return "Cifrele trebuie să fie cuprinse între 0 și 6!", 1
 
-    return Polybius.polybius(input_text, alfabet, options['operatie']), 0
+    return polybius.polybius(input_text, alfabet, options['operatie']), 0
 
 # functie de validare pt cifrul bifid
 def _validate_bifid(input_text, options):
@@ -135,7 +135,7 @@ def _validate_bifid(input_text, options):
     if undef_chars:
        return undef_chars, 1
 
-    return Polybius.bifid(input_text, alfabet, options['operatie']), 0
+    return polybius.bifid(input_text, alfabet, options['operatie']), 0
 
 # functie de validare pt cifrul adfgvx
 def _validate_adfgvx(input_text, options):
@@ -175,7 +175,7 @@ def _validate_adfgvx(input_text, options):
         if len(input_text_words) != len(key):
             return "Numărul de cuvinte din mesajul criptat trebuie să fie egal cu lungimea cheii!", 1
 
-    return Polybius.adfgvx(input_text, alfabet, key, options['operatie']), 0
+    return polybius.adfgvx(input_text, alfabet, key, options['operatie']), 0
 
 # validarea cheii
 def _key_validation_playfair(key):
@@ -222,7 +222,7 @@ def _validate_playfair(input_text, options):
     if rez:
         return rez, 1
 
-    return DigrafSub.playfair(input_text, cheie, operation), 0
+    return digraf_sub.playfair(input_text, cheie, operation), 0
 
 # validarea cheii
 def _hill_validation_key(key):
@@ -275,7 +275,7 @@ def _validate_hill(input_text, options):
     if rez:
         return rez, 1
 
-    return DigrafSub.hill(input_text, cheie, operation), 0
+    return digraf_sub.hill(input_text, cheie, operation), 0
 
 # folosita la decriptare
 def rc4_validation_cypher(message):
@@ -305,7 +305,7 @@ def _validate_rc4(input_text, options):
         if rez:
             return rez, 1
 
-    return Rivest.rc4(input_text, key, operation), 0
+    return rivest.rc4(input_text, key, operation), 0
 
 # folosita la decriptare
 def _aes128_validation_cypher(message):
@@ -372,21 +372,21 @@ def _validate_aes(input_text, options):
         if rez:
             return rez, 1
 
-    return Block.aes(input_text, key, format_key, operation), 0
+    return block.aes(input_text, key, format_key, operation), 0
 
 # validarea nu are sens pt hashing
 def _hashing(input_text, options):
 
     varianta = options['varianta']
     if varianta == 'SHA-1':
-        return Hashing.sha_1(input_text)
+        return hashing.sha_1(input_text)
     elif varianta == 'SHA-256':
-        return Hashing.sha_256(input_text)
+        return hashing.sha_256(input_text)
 
     return None
 
 # folosita atat la criptare cat si decriptare (deoarece operatiile sunt confundate)
-def _enigma_validation_cypher_plain(message):
+def _engima_validation_cypher_plain(message):
 
     valid_chars = [" "]
 
@@ -453,17 +453,17 @@ def _plugboard_validation(key):
 # transforma lista de perechi de litere intr-un dictionar
 def _from_array2dict(arr):
 
-    enigma_dict = {}
+    engima_dict = {}
 
     groups = [group for group in arr.split(" ")]
 
     for i in range(len(groups)):
-        enigma_dict.update({groups[i][0]: groups[i][1]})
+        engima_dict.update({groups[i][0]: groups[i][1]})
 
-    return enigma_dict
+    return engima_dict
 
-# functie de validare pt enigma
-def _validate_enigma(input_text, options):
+# functie de validare pt engima
+def _validate_engima(input_text, options):
 
     reflector = options['reflector']
     rotor1 = options['rotor1']
@@ -488,21 +488,21 @@ def _validate_enigma(input_text, options):
         # fiecare pereche de litere devine o pereche cheie:valoare,
         # unde cheia e prima litera, iar valoarea e a doua litera
 
-    rez = _enigma_validation_cypher_plain(input_text)
+    rez = _engima_validation_cypher_plain(input_text)
     if rez:
         return rez, 1
 
     if model == '1' or model == '3':
-        return Enigma.enigma1(input_text, reflector, rotor1, rotor2, rotor3, tablou)
+        return enigma.enigma1(input_text, reflector, rotor1, rotor2, rotor3, tablou)
     else:
-        return Enigma.enigma4(input_text, reflector, spec_rotor, rotor1, rotor2, rotor3, tablou)
+        return enigma.enigma4(input_text, reflector, spec_rotor, rotor1, rotor2, rotor3, tablou)
 
 # functia apelata de frontend pentru accesarea backend-ului
 def main_validator(algorithm_name, input_text, options):
 
     validator_dict = {'cezar':_validate_cezar, 'vigenere':_validate_vigenere, 'polybius':_validate_polybius,
                             'adfgvx':_validate_adfgvx, 'bifid':_validate_bifid, 'playfair':_validate_playfair,
-                            'hill':_validate_hill, 'rc4':_validate_rc4,'aes':_validate_aes, 'enigma':_validate_enigma,
+                            'hill':_validate_hill, 'rc4':_validate_rc4,'aes':_validate_aes, 'engima':_validate_engima,
                       'hashing':_hashing}
 
     # verificari preliminatorii

@@ -3,17 +3,12 @@ import tkinter.ttk as ttk
 import tkinter.messagebox as msgbox
 from tkinter.constants import DISABLED, NORMAL
 import string
-from ..Conector import Validator
+from ..conector import validator
 try:
-    import CustomWidgets as Cw
+    import custom_widgets as Cw
 except:
-    from . import CustomWidgets as Cw
-try:
-    from ..Algoritmi import Basic
-    from ..Algoritmi import Polybius
-    from ..Algoritmi import Hashing
-except:
-    print("IMPORTURILE RELATIVE FUNCTIONEAZA NUMA CAND RULEZI CODUL DIN main.py")
+    from . import custom_widgets as Cw
+
 
 def right_click_menu(widget):
     menu = tk.Menu(widget, tearoff = 0)
@@ -632,7 +627,7 @@ def update_settings(combobox, settings_frame, entry_vals):
 
         caesar_entry = Cw.LabeledEntry(settings_frame, "Cheie de criptare:", "w", 4,0,0)
         caesar_entry.insert(0,"0")
-        brute_force_button = ttk.Button(settings_frame, text = "Spargere parolă", width = 23, command = lambda: brute_force_caesar(entry_vals["textbox1"], entry_vals["textbox2"]))
+        brute_force_button = ttk.Button(settings_frame, text = "Spargere mesaj", width = 23, command = lambda: brute_force_caesar(entry_vals["textbox1"], entry_vals["textbox2"]))
         brute_force_button.grid(row = 1, column = 0)
         entry_vals["caesar_entry"] = caesar_entry
 
@@ -777,7 +772,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
 
         shift_value = entry_vals["caesar_entry"].get()
         options = {"cheie": shift_value, "operatie": "criptare"}
-        message, code = Validator.main_validator("cezar", cleaned_text, options)
+        message, code = validator.main_validator("cezar", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -790,7 +785,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
 
         key_value = entry_vals["vigenere_textbox"].get("1.0", "end-1c")
         options = {"cheie": key_value, "operatie": "criptare"}
-        message, code = Validator.main_validator("vigenere", cleaned_text, options)
+        message, code = validator.main_validator("vigenere", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -804,7 +799,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
         size_combobox = entry_vals["size_combobox"].get()
         options = {"alfabet": alphabet, "marime_matrice": size_combobox, "operatie": "criptare"}
-        message, code = Validator.main_validator("polybius", cleaned_text, options)
+        message, code = validator.main_validator("polybius", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -818,7 +813,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
         size_combobox = entry_vals["size_combobox"].get()
         options = {"alfabet": alphabet, "marime_matrice": size_combobox, "operatie": "criptare"}
-        message, code = Validator.main_validator("bifid", cleaned_text, options)
+        message, code = validator.main_validator("bifid", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -833,7 +828,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
         size_combobox = entry_vals["size_combobox"].get()
         options = {"alfabet": alphabet, "cheie": key, "marime_matrice": size_combobox, "operatie": "criptare"}
-        message, code = Validator.main_validator("adfgvx", cleaned_text, options)
+        message, code = validator.main_validator("adfgvx", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -846,7 +841,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
 
         choice = entry_vals["hashing_choice"].get()
         options = {"varianta" : choice, "operatie": "criptare"}
-        message = Validator.main_validator("hashing", cleaned_text, options)
+        message = validator.main_validator("hashing", cleaned_text, options)
         textbox2.delete("1.0", "end-1c")
         textbox2.insert("end-1c", message)
         textbox2.config(state=DISABLED)
@@ -857,7 +852,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
         key_format = entry_vals["aes_key"].get()
         key = entry_vals["aes_textbox"].get("1.0", tk.END).strip()
         options = {"tip": aes_type, "format_cheie": key_format, "cheie": key, "operatie":"criptare"}
-        message, code = Validator.main_validator("aes", cleaned_text, options)
+        message, code = validator.main_validator("aes", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -870,7 +865,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
 
         key = entry_vals["rc4_textbox"].get("1.0", tk.END).strip()
         options = {"cheie": key, "operatie": "criptare"}
-        message, code = Validator.main_validator("rc4", cleaned_text, options)
+        message, code = validator.main_validator("rc4", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -883,7 +878,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
 
         key = entry_vals["playfair_textbox"].get("1.0", tk.END).strip()
         options = {"cheie": key, "operatie": "criptare"}
-        message, code = Validator.main_validator("playfair", cleaned_text, options)
+        message, code = validator.main_validator("playfair", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -896,7 +891,7 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
 
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
         options = {"cheie": alphabet, "operatie": "criptare"}
-        message, code = Validator.main_validator("hill", cleaned_text, options)
+        message, code = validator.main_validator("hill", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -925,7 +920,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
 
         shift_value = entry_vals["caesar_entry"].get()
         options = {"cheie": shift_value, "operatie": "decriptare"}
-        message, code = Validator.main_validator("cezar", cleaned_text, options)
+        message, code = validator.main_validator("cezar", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -938,7 +933,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
 
         key_value = entry_vals["vigenere_textbox"].get("1.0", "end-1c")
         options = {"cheie": key_value, "operatie": "decriptare"}
-        message, code = Validator.main_validator("vigenere", cleaned_text, options)
+        message, code = validator.main_validator("vigenere", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -952,7 +947,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
         size_combobox = entry_vals["size_combobox"].get()
         options = {"alfabet": alphabet, "marime_matrice": size_combobox, "operatie": "decriptare"}
-        message, code = Validator.main_validator("polybius", cleaned_text, options)
+        message, code = validator.main_validator("polybius", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -966,7 +961,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
         size_combobox = entry_vals["size_combobox"].get()
         options = {"alfabet": alphabet, "marime_matrice": size_combobox, "operatie": "decriptare"}
-        message, code = Validator.main_validator("bifid", cleaned_text, options)
+        message, code = validator.main_validator("bifid", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -981,7 +976,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
         size_combobox = entry_vals["size_combobox"].get()
         options = {"alfabet": alphabet, "cheie": key, "marime_matrice": size_combobox, "operatie": "decriptare"}
-        message, code = Validator.main_validator("adfgvx", cleaned_text, options)
+        message, code = validator.main_validator("adfgvx", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -1001,7 +996,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
         key_format = entry_vals["aes_key"].get()
         key = entry_vals["aes_textbox"].get("1.0", tk.END).strip()
         options = {"tip": aes_type, "format_cheie": key_format, "cheie": key, "operatie": "decriptare"}
-        message, code = Validator.main_validator("aes", cleaned_text, options)
+        message, code = validator.main_validator("aes", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -1014,7 +1009,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
 
         key = entry_vals["rc4_textbox"].get("1.0", tk.END).strip()
         options = {"cheie": key, "operatie": "decriptare"}
-        message, code = Validator.main_validator("rc4", cleaned_text, options)
+        message, code = validator.main_validator("rc4", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -1027,7 +1022,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
 
         key = entry_vals["playfair_textbox"].get("1.0", tk.END).strip()
         options = {"cheie": key, "operatie": "decriptare"}
-        message, code = Validator.main_validator("playfair", cleaned_text, options)
+        message, code = validator.main_validator("playfair", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -1040,7 +1035,7 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
 
         alphabet = polybius_bifid_adfgvx_alphabet(entry_vals)
         options = {"cheie": alphabet, "operatie": "decriptare"}
-        message, code = Validator.main_validator("hill", cleaned_text, options)
+        message, code = validator.main_validator("hill", cleaned_text, options)
         if code == 1:
             msgbox.showerror("Eroare", message)
             return
@@ -1059,13 +1054,13 @@ def brute_force_caesar(textbox1, textbox2):
     cleaned_text = input_text.replace("\n", " ")
     cleaned_text = cleaned_text.replace("\t", " ")
     textbox2.config(state = NORMAL)
-    options = {"cheie": 1, "operatie": "decriptare"}
-    message, code = Validator.main_validator("cezar", cleaned_text, options)
+    options = {"cheie": 1, "operatie": "spargere"}
+    message, code = validator.main_validator("cezar", cleaned_text, options)
     if code == 1:
         msgbox.showerror("Eroare", message)
         return
     else:
-        string_list = Basic.cezar(cleaned_text, None, 'spargere')
+        string_list = message
         textbox2.delete("1.0", "end-1c")
         for i, strings in enumerate(string_list, start=1):
             textbox2.insert("end", f"{i}. {strings}\n")

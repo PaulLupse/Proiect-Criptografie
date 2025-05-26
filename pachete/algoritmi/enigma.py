@@ -125,9 +125,9 @@ _rotor_config = np.array(['EKMFLGDQVZNTOWYHXUSPAIBRCJ/Y'.lower(),
                     'NZJHGRCXMYSWBOUFAIVLPEKQDT/HU'.lower(),
                     'FKQHTLXOCBJSPDZRAMEWNIUYGV/HU'.lower()], dtype = object)
 
-_reflector_config = {'a': 'EJMZALYXVBWFCRQUONTSPIKHGD'.lower(),
-                        'b':'YRUHQSLDPXNGOKMIEBFZCWVJAT'.lower(),
-                        'c':'FVPJIAOYEDRZXWGCTKUQSBNMHL'.lower()}
+_reflector_config = {'UKW A': 'EJMZALYXVBWFCRQUONTSPIKHGD'.lower(),
+                        'UKW B':'YRUHQSLDPXNGOKMIEBFZCWVJAT'.lower(),
+                        'UKW C':'FVPJIAOYEDRZXWGCTKUQSBNMHL'.lower()}
 
 # tablou: dictionar
 def enigma1(mesaj, reflector, rotor1, rotor2, rotor3, tablou):
@@ -207,8 +207,8 @@ def enigma4(mesaj, reflector, spec_rotor, rotor1, rotor2, rotor3, tablou):
 
     # rotoarele speciale sunt statice, nu se misca pe parcursul criptarii
     # desi pot fii miscate, iar setarea de inel de asemenea poate fii schimbata
-    spec_rotor_config = {'beta':'LEYJVCNIXWPBQMDRTAKZGFUHOS'.lower(),
-                        'gamma':'FSOKANUERHMBTIYCWLQPZXVGJD'.lower()}
+    spec_rotor_config = {'Beta':'LEYJVCNIXWPBQMDRTAKZGFUHOS'.lower(),
+                        'Gamma':'FSOKANUERHMBTIYCWLQPZXVGJD'.lower()}
 
     # prezenta rotoarelor speciale este singura diferenta de la modelul 1 si 3
 
