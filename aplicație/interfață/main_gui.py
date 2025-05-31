@@ -1152,10 +1152,10 @@ def main():
     root.title("Algoritmi de Criptare")
 
     entry_vals = {}
-    textbox1 = Cw.LabeledTextbox(root, "Text:", "n", 10, 20,0,0,20,1)
+    textbox1 = Cw.LabeledTextbox(root, "Text:", "n", 10, 40,0,0,20,1)
     entry_vals["textbox1"] = textbox1
     right_click_menu(textbox1)
-    textbox2 = Cw.LabeledTextbox(root, "Text criptat/decriptat:", "n", 10, 20,0,2,20,1)
+    textbox2 = Cw.LabeledTextbox(root, "Text criptat/decriptat:", "n", 10, 40,0,2,20,1)
     entry_vals["textbox2"] = textbox2
     right_click_menu(textbox2)
 

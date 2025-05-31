@@ -1,5 +1,4 @@
 import tkinter as tk
-import tkinter.ttk as ttk
 from tkinter import scrolledtext
 
 class LabeledTextbox(scrolledtext.ScrolledText):
