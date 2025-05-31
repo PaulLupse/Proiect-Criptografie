@@ -1169,9 +1169,9 @@ def main():
     combobox.grid(row = 0, column = 0, columnspan = 2)
     combobox.bind("<<ComboboxSelected>>", lambda event: update_settings(combobox, settings_frame, entry_vals))
 
-    crypt_button = ttk.Button(options_frame, text = "Criptare", command = lambda: crypt(textbox1, textbox2, combobox, entry_vals))
+    crypt_button = ttk.Button(options_frame, text = "Criptare", command = lambda: wrap_crypt(textbox1, textbox2, combobox, entry_vals))
     crypt_button.grid(row = 1, column = 0)
-    decrypt_button = ttk.Button(options_frame, text = "Decriptare", command = lambda: decrypt(textbox1, textbox2, combobox, entry_vals))
+    decrypt_button = ttk.Button(options_frame, text = "Decriptare", command = lambda: wrap_decrypt(textbox1, textbox2, combobox, entry_vals))
     decrypt_button.grid(row = 1, column = 1)
 
     root.mainloop()
