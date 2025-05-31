@@ -142,7 +142,7 @@ def enigma1(mesaj, reflector, rotor1, rotor2, rotor3, tablou):
     for litera in 'abcdefghijklmnopqrstuvwxyz':
         try:
             interschimbare[litera]
-        except: # daca litera nu a fost 'conectata' in tablou la o alta litera,
+        except KeyError: # daca litera nu a fost 'conectata' in tablou la o alta litera,
             interschimbare[litera] = litera # aceasta va fii schimbata cu ea insasi
 
     # rotoarele sunt notate de la stanga la dreapta
@@ -220,7 +220,7 @@ def enigma4(mesaj, reflector, spec_rotor, rotor1, rotor2, rotor3, tablou):
     for litera in 'abcdefghijklmnopqrstuvwxyz':
         try:
             interschimbare[litera]
-        except:
+        except KeyError:
             interschimbare[litera] = litera
 
     reflector = _Reflector(_reflector_config[reflector])
