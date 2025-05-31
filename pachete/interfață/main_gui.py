@@ -606,9 +606,11 @@ def generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals)
         entry_vals["position1"] = position1_entry
         entry_vals["position2"] = position2_entry
         entry_vals["position3"] = position3_entry
+        entry_vals["position4"] = position4_entry
         entry_vals["ring1"] = ring1_entry
         entry_vals["ring2"] = ring2_entry
         entry_vals["ring3"] = ring3_entry
+        entry_vals["ring4"] = ring4_entry
         entry_vals["plugboard"] = plugboard_entry
 
 
@@ -902,7 +904,38 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
 
     elif selected_algorithm == "Enigma":
 
-        ...
+        if entry_vals["enigma_version_combobox"].get() == 'Enigma M4 "Shark"':
+            reflector = entry_vals["reflector"].get()[:5]
+            spec_rotor = {"rotor": entry_vals["rotor1"].get(), "offset": int(entry_vals["position1"].get()[0]), "inel": int(entry_vals["ring1"].get()[0])}
+            rotor2 = {"rotor": entry_vals["rotor2"].get(), "offset": int(entry_vals["position2"].get()[0]), "inel": int(entry_vals["ring2"].get()[0])}
+            rotor3 = {"rotor": entry_vals["rotor3"].get(), "offset": int(entry_vals["position3"].get()[0]), "inel": int(entry_vals["ring3"].get()[0])}
+            rotor4 = {"rotor": entry_vals["rotor4"].get(), "offset": int(entry_vals["position4"].get()[0]), "inel": int(entry_vals["ring4"].get()[0])}
+            plugboard = entry_vals["plugboard"].get()
+            options = {"reflector": reflector, "spec_rotor": spec_rotor, "rotor1": rotor2, "rotor2": rotor3, "rotor3": rotor4, "tablou": plugboard, "operatie": "criptare", "model": entry_vals["enigma_version_combobox"].get()}
+            message, code = validator.main_validator("enigma", cleaned_text, options)
+            if code == 1:
+                msgbox.showerror("Eroare", message)
+                return
+            else:
+                textbox2.delete("1.0", "end-1c")
+                textbox2.insert("end-1c", message)
+                textbox2.config(state=DISABLED)
+        else:
+            reflector = entry_vals["reflector"].get()
+            rotor1 = {"rotor": entry_vals["rotor1"].get(), "offset": int(entry_vals["position1"].get()[0]), "inel": int(entry_vals["ring1"].get()[0])}
+            rotor2 = {"rotor": entry_vals["rotor2"].get(), "offset": int(entry_vals["position2"].get()[0]), "inel": int(entry_vals["ring2"].get()[0])}
+            rotor3 = {"rotor": entry_vals["rotor3"].get(), "offset": int(entry_vals["position3"].get()[0]), "inel": int(entry_vals["ring3"].get()[0])}
+            plugboard = entry_vals["plugboard"].get()
+            options = {"reflector": reflector, "rotor1": rotor1, "rotor2": rotor2, "rotor3": rotor3, "tablou": plugboard, "operatie": "criptare", "model": entry_vals["enigma_version_combobox"].get()}
+            message, code = validator.main_validator("enigma", cleaned_text, options)
+            if code == 1:
+                msgbox.showerror("Eroare", message)
+                return
+            else:
+                textbox2.delete("1.0", "end-1c")
+                textbox2.insert("end-1c", message)
+                textbox2.config(state=DISABLED)
+
 
 def decrypt(textbox1, textbox2, combobox, entry_vals):
 
@@ -1046,7 +1079,37 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
 
     elif selected_algorithm == "Enigma":
 
-        ...
+        if entry_vals["enigma_version_combobox"].get() == 'Enigma M4 "Shark"':
+            reflector = entry_vals["reflector"].get()[:5]
+            spec_rotor = {"rotor": entry_vals["rotor1"].get(), "offset": int(entry_vals["position1"].get()[0]), "inel": int(entry_vals["ring1"].get()[0])}
+            rotor2 = {"rotor": entry_vals["rotor2"].get(), "offset": int(entry_vals["position2"].get()[0]), "inel": int(entry_vals["ring2"].get()[0])}
+            rotor3 = {"rotor": entry_vals["rotor3"].get(), "offset": int(entry_vals["position3"].get()[0]), "inel": int(entry_vals["ring3"].get()[0])}
+            rotor4 = {"rotor": entry_vals["rotor4"].get(), "offset": int(entry_vals["position4"].get()[0]), "inel": int(entry_vals["ring4"].get()[0])}
+            plugboard = entry_vals["plugboard"].get()
+            options = {"reflector": reflector, "spec_rotor": spec_rotor, "rotor1": rotor2, "rotor2": rotor3, "rotor3": rotor4, "tablou": plugboard, "operatie": "decriptare", "model": entry_vals["enigma_version_combobox"].get()}
+            message, code = validator.main_validator("enigma", cleaned_text, options)
+            if code == 1:
+                msgbox.showerror("Eroare", message)
+                return
+            else:
+                textbox2.delete("1.0", "end-1c")
+                textbox2.insert("end-1c", message)
+                textbox2.config(state=DISABLED)
+        else:
+            reflector = entry_vals["reflector"].get()
+            rotor1 = {"rotor": entry_vals["rotor1"].get(), "offset": int(entry_vals["position1"].get()[0]), "inel": int(entry_vals["ring1"].get()[0])}
+            rotor2 = {"rotor": entry_vals["rotor2"].get(), "offset": int(entry_vals["position2"].get()[0]), "inel": int(entry_vals["ring2"].get()[0])}
+            rotor3 = {"rotor": entry_vals["rotor3"].get(), "offset": int(entry_vals["position3"].get()[0]), "inel": int(entry_vals["ring3"].get()[0])}
+            plugboard = entry_vals["plugboard"].get()
+            options = {"reflector": reflector, "rotor1": rotor1, "rotor2": rotor2, "rotor3": rotor3, "tablou": plugboard, "operatie": "decriptare", "model": entry_vals["enigma_version_combobox"].get()}
+            message, code = validator.main_validator("enigma", cleaned_text, options)
+            if code == 1:
+                msgbox.showerror("Eroare", message)
+                return
+            else:
+                textbox2.delete("1.0", "end-1c")
+                textbox2.insert("end-1c", message)
+                textbox2.config(state=DISABLED)
 
 def brute_force_caesar(textbox1, textbox2):
 
@@ -1066,6 +1129,21 @@ def brute_force_caesar(textbox1, textbox2):
             textbox2.insert("end", f"{i}. {strings}\n")
         textbox2.config(state = DISABLED)
 
+def wrap_crypt(textbox1, textbox2, combobox, entry_vals):
+
+    try:
+        crypt(textbox1, textbox2, combobox, entry_vals)
+    except:
+        msgbox.showerror("Eroare", "Eroare interna!")
+        return
+
+def wrap_decrypt(textbox1, textbox2, combobox, entry_vals):
+
+    try:
+        decrypt(textbox1, textbox2, combobox, entry_vals)
+    except:
+        msgbox.showerror("Eroare", "Eroare interna!")
+        return
 
 def main():
 
