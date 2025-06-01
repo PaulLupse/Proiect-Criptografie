@@ -320,9 +320,3 @@ def adfgvx(mesaj, alfabet, cheie, operatie):
             index += 2
 
         return mesaj_decriptat
-
-if __name__ == '__main__':
-    a = adfgvx('a\t\t\t\t\t'.replace(' ', ''), 'abcdefghiklmnopqrstuvwxyz', 'salut', 'criptare')
-    print(a)
-
-"La soare roata se mareste la umbra numai carnea creste"

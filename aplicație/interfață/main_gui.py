@@ -4,10 +4,7 @@ import tkinter.messagebox as msgbox
 from tkinter.constants import DISABLED, NORMAL
 import string
 from ..conector import validator
-try:
-    import custom_widgets as Cw
-except:
-    from . import custom_widgets as Cw
+from . import custom_widgets as Cw
 
 # Functie pentru butonul click dreapta care permite utilizatorului sa dea copy/paste
 def right_click_menu(widget):

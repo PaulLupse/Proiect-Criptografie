@@ -347,8 +347,3 @@ def aes(mesaj, cheie, format_cheie, operatie):
             mesaj_decriptat += ''
 
         return mesaj_decriptat
-
-if __name__ == '__main__':
-
-    a = aes('eca4a74ae9a7ab4b8785ecbfea01e4e2 d7ece1b0f9a13ff6eeb7ffb0866c7919 e93c747ce2c953af60f5d96a085fa6ec 6f9284d31756e8cff45a3f08da8d5db8', '5468617473206D79204B756E672046755468617473206D79204B756E67204675'.lower().replace(' ', ''), 'hex', 'decriptare')
-    print(a)

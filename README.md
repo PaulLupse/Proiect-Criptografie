@@ -1,5 +1,7 @@
 # Proiect-Criptografie 
 
-One of the fonts used in the poster is made by this fellow: Sizenko Alexander (Digital-7 font).
+Pentru a rula fisierul principal (main.py), următoarele module python trebuiesc să fie instalate:
+- numpy
+- sympy
+- BitVector
 
-:-)

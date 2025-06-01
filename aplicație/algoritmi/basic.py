@@ -121,6 +121,3 @@ def main():
     a = cezar('Cr jfriv ifrkr jv drivjkv', None, 'spargere')
     for index, candidat in enumerate(a):
         print(str(index + 1) + '. ' + candidat)
-
-if __name__ == '__main__':
-    from ..utilități import ceva

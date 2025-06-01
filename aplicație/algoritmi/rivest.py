@@ -7,16 +7,31 @@ import numpy as np
 # si poate cripta mesaje cu orice caracter definit in tabela ascii
 def rc4(mesaj, cheie, operatie):
 
-    # rc4 lucreaza pe mesaje de maxim 255 de caractere
+    # rc4 lucreaza pe mesaje de maxim 127 de caractere
     # daca mesajul este de lungime mai mare, il impartim
-    # prima parte are 255 de caractere, cealalta are restul caracterelor
+    # prima parte are 127 de caractere, cealalta are restul caracterelor
+
+    cp_cheie = cheie
+
+    print(mesaj)
+    print(len(mesaj))
+
     rest_mesaj = None
-    if len(mesaj) > 255:
-        rest_mesaj = mesaj[255::]
-        mesaj = mesaj[:255:]
+    if operatie == 'criptare':
+        if len(mesaj) > 127:
+            rest_mesaj = mesaj[127::]
+            mesaj = mesaj[:127:]
+            print('mai mare ca 127')
+    else:
+        if len(mesaj) > 254:
+            rest_mesaj = mesaj[254::]
+            mesaj = mesaj[:254:]
+            print('mai mare ca 254')
+            print(rest_mesaj)
 
     lung_cheie = len(cheie)
     lung_mesaj = len(mesaj)
+    #print(lung_mesaj)
 
     # consideram permutarea identitate
     permutare = np.array([i for i in range(0, 256)], dtype = int)
@@ -75,11 +90,6 @@ def rc4(mesaj, cheie, operatie):
 
         rest_mesaj_decriptat = ''
         if rest_mesaj: # daca mesajul are mai mult de 255 de caractere
-            rest_mesaj_decriptat = rc4(rest_mesaj, cheie, operatie) # apelam functia pentru restul mesajului
+            rest_mesaj_decriptat = rc4(rest_mesaj, cp_cheie, operatie) # apelam functia pentru restul mesajului
 
         return mesaj_decriptat + rest_mesaj_decriptat # si il adaugam la mesajul final
-
-if __name__ == '__main__':
-    print(rc4('La soare roata se mareste, la umbra numai carnea creste. Si somn e carnea, se dezumfla, dar fring si umbra iar o umfla.', 'Riga', 'criptare'))
-
-'La soare roata se mareste, la umbra numai carnea creste. Si somn e carnea, se dezumfla, dar fring si umbra iar o umfla.'

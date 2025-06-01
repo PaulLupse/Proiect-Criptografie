@@ -232,6 +232,3 @@ def hill(mesaj, cheie, operatie):
 
         return mesaj_decriptat
 
-if __name__ == '__main__':
-    a = hill('gp', 'AHGJ', 'decriptare')
-    print(a)

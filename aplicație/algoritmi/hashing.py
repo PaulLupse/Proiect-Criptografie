@@ -241,6 +241,3 @@ def sha_256(mesaj):
         h8 = (__sum_mod((h8, H), MOD))
 
     return hex(h1)[2::] + hex(h2)[2::] + hex(h3)[2::] + hex(h4)[2::] + hex(h5)[2::] + hex(h6)[2::] + hex(h7)[2::] + hex(h8)[2::]
-
-if __name__ == '__main__':
-    print(sha_256('La soare roata se mareste, la umbra numai carnea creste, si somn e carnea, se dezumfla, dar frig si umbra iar o umfla. La soare roata se mareste, la umbra numai carnea creste, si somn e carnea, se dezumfla, dar frig si umbra iar o umfla. La soare roata se mareste, la umbra numai carnea creste, si somn e carnea, se dezumfla, dar frig si umbra iar o umfla. La soare roata se mareste, la umbra numai carnea creste, si somn e carnea, se dezumfla, dar frig si umbra iar o umfla. La soare roata se mareste, la umbra numai carnea creste, si somn e carnea, se dezumfla, dar frig si umbra iar o umfla. La soare roata se mareste, la umbra numai carnea creste, si somn e carnea, se dezumfla, dar frig si umbra iar o umfla.'))

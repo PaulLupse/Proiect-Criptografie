@@ -271,6 +271,3 @@ def enigma4(mesaj, reflector, spec_rotor, rotor1, rotor2, rotor3, tablou):
         mesaj_substituit += litera
 
     return mesaj_substituit
-
-#woksr ghsir bpfwu tuyyu bbvns jyulp ntopz uapfx tduxn
-#wo ksrgh sirbp fw utqyyub bv nsjyu lpnto pzuapf xtdexn
