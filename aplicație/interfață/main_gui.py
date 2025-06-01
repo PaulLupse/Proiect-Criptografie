@@ -9,23 +9,27 @@ try:
 except:
     from . import custom_widgets as Cw
 
-
+# Functie pentru butonul click dreapta care permite utilizatorului sa dea copy/paste
 def right_click_menu(widget):
     menu = tk.Menu(widget, tearoff = 0)
     menu.add_command(label = "Copy", command = lambda: widget.event_generate("<<Copy>>"))
     menu.add_command(label = "Paste", command = lambda: widget.event_generate("<<Paste>>"))
 
+    # Functie care afiseaza o fereastra de tip popup cu optiunile copy/paste
     def show_menu(event):
         menu.tk_popup(event.x_root, event.y_root)
 
     widget.bind("<Button-3>", show_menu)
 
+# Functie care limiteaza entry-urile la un singur caracter
 def limit_one_char(event):
     widget = event.widget
     val = widget.get()
     if len(val) > 1:
         widget.delete(1, tk.END)
 
+# Functie care genereaza matricea folosita pentru alfabet la algoritmii Polybius, Bifid, ADFGVX, Hill Cipher in functie
+# de marimea selectata in combobox
 def generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entry_vals):
 
     size = 5
@@ -41,6 +45,7 @@ def generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entr
     if combobox_value == "7x7":
         size = 7
 
+    # Sterge toate widget-urile din settings_frame, mai putin frameul cu combobox pentru dimensiune si butonul de resetare alfabet
     for widget in settings_frame.winfo_children():
         if not isinstance(widget, tk.Frame):
             widget.destroy()
@@ -133,6 +138,8 @@ def generate_polybius_bifid_matrix(settings_frame, size_combobox, combobox, entr
         entry_vals["matrix_entry"] = polybius_entry
         reset_polybius_bifid_entry(entry_vals, size_combobox)
 
+# Functie atribuita butonului "Resetare alfabet" care reseteaza matricea la valorile initiale prestabilite pentru fiecare
+# dimensiune a matricei
 def reset_polybius_bifid_entry(entry_vals, size_combobox):
 
     alphabet = []
@@ -167,6 +174,7 @@ def reset_polybius_bifid_entry(entry_vals, size_combobox):
             if i < len(alphabet):
                 entry.insert(0, alphabet[i])
 
+# Functie care transforma un numar intr-o litera, folosita la Enigma pentru a seta valorile potrivite in entry-uri
 def number_to_letter(number):
 
     if 1 <= number <= 26:
@@ -174,6 +182,7 @@ def number_to_letter(number):
     else:
         return ""
 
+# Functie care seteaza un numar si o litera intr-un entry
 def enigma_entry_set(entry, value):
 
     entry.config(state="normal")
@@ -181,6 +190,7 @@ def enigma_entry_set(entry, value):
     entry.insert(0, f"{value} {number_to_letter(value)}")
     entry.config(state="readonly")
 
+# Functie folosita pentru butoanele "+" de la Engima, care incrementeaza valoarea din entry cu 1
 def increment(entry):
 
     entry.config(state="normal")
@@ -192,6 +202,7 @@ def increment(entry):
         number = 1
     enigma_entry_set(entry, number)
 
+# Functie folosita pentru butoanele "-" de la Enigma, care decrementeaza valoarea din entry cu 1
 def decrement(entry):
 
     entry.config(state="normal")
@@ -203,10 +214,12 @@ def decrement(entry):
         number = 26
     enigma_entry_set(entry, number)
 
+# Functie care genereaza optiunile necesare pentru Enigma, in functie de modelul ales in combobox
 def generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals):
 
     selected_version = entry_vals["enigma_version_combobox"].get()
 
+    # Sterge toate widget-urile din frameul settings_frame, mai putin comboboxul pentru modelul algoritmului Enigma
     for widget in settings_frame.winfo_children():
         if widget != enigma_version_combobox.master:
             widget.destroy()
@@ -613,9 +626,10 @@ def generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals)
         entry_vals["ring4"] = ring4_entry
         entry_vals["plugboard"] = plugboard_entry
 
-
+# Functie care actualizeaza frame-ul settings_frame in functie de algoritmul ales in comboboxul cu algoritmi
 def update_settings(combobox, settings_frame, entry_vals):
 
+    # Sterge toate widget-urile din settings_frame
     for widget in settings_frame.winfo_children():
         widget.destroy()
 
@@ -748,6 +762,7 @@ def update_settings(combobox, settings_frame, entry_vals):
 
         generate_enigma_options(settings_frame, enigma_version_combobox, entry_vals)
 
+# Functie care extrage din matrice valorile si le pune intr-un string sub forma unui alfabet
 def polybius_bifid_adfgvx_alphabet(entry_vals):
 
     alphabet = ""
@@ -759,6 +774,8 @@ def polybius_bifid_adfgvx_alphabet(entry_vals):
             alphabet += value
     return alphabet
 
+# Functie atribuita butonului de criptare, care trimite validatorului datele necesare si care primeste mesajul criptat si codul 0,
+# sau un mesaj de eroare si codul 1
 def crypt(textbox1, textbox2, combobox, entry_vals):
 
     selected_algorithm = combobox.get()
@@ -936,7 +953,8 @@ def crypt(textbox1, textbox2, combobox, entry_vals):
                 textbox2.insert("end-1c", message)
                 textbox2.config(state=DISABLED)
 
-
+# Functie atribuita butonului de decriptare, care trimite validatorului datele necesare si care primeste mesajul decriptat si codul 0,
+# sau un mesaj de eroare si codul 1
 def decrypt(textbox1, textbox2, combobox, entry_vals):
 
     selected_algorithm = combobox.get()
@@ -1111,6 +1129,8 @@ def decrypt(textbox1, textbox2, combobox, entry_vals):
                 textbox2.insert("end-1c", message)
                 textbox2.config(state=DISABLED)
 
+# Functie atribuita butonului "Spargere mesaj", care trimite validatorului datele necesare si care primeste o lista
+# de string-uri si codul 0, sau un mesaj de eroare si codul 1
 def brute_force_caesar(textbox1, textbox2):
 
     input_text = textbox1.get("1.0", "end-1c")
@@ -1129,6 +1149,7 @@ def brute_force_caesar(textbox1, textbox2):
             textbox2.insert("end", f"{i}. {strings}\n")
         textbox2.config(state = DISABLED)
 
+# Functie care incearca criptarea, iar daca nu reuseste afiseaza o eroare
 def wrap_crypt(textbox1, textbox2, combobox, entry_vals):
 
     try:
@@ -1137,6 +1158,7 @@ def wrap_crypt(textbox1, textbox2, combobox, entry_vals):
         msgbox.showerror("Eroare", "Eroare interna!")
         return
 
+# Functie care incearca decriptarea, iar daca nu reuseste afiseaza o eroare
 def wrap_decrypt(textbox1, textbox2, combobox, entry_vals):
 
     try:
@@ -1145,13 +1167,16 @@ def wrap_decrypt(textbox1, textbox2, combobox, entry_vals):
         msgbox.showerror("Eroare", "Eroare interna!")
         return
 
+# Functie principala care contine toate widget-urile initiale (textbox-uri, combobox, butoane criptare/decriptare)
 def main():
 
     root = tk.Tk()
     root.resizable(False,False)
     root.title("Algoritmi de Criptare")
 
+    # Dictionar folosit pentru transmiterea usoara a parametrilor intre functii
     entry_vals = {}
+
     textbox1 = Cw.LabeledTextbox(root, "Text:", "n", 10, 40,0,0,20,1)
     entry_vals["textbox1"] = textbox1
     right_click_menu(textbox1)
